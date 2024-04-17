@@ -1,7 +1,6 @@
 import * as path from "node:path";
-import { watch } from "rollup";
-import { bundle } from "./build";
-import { createRollupInputOptions, rollupOutputOptions } from "./rollup-config";
+import chokidar from "chokidar";
+import { build, bundle } from "./build";
 
 let assets: Awaited<ReturnType<typeof bundle>> = {};
 let onChange: () => void;
@@ -16,36 +15,33 @@ const reset = () => {
 let onChangePromise: Promise<void>;
 reset();
 
-const b = watch({
-  ...createRollupInputOptions(false),
-  watch: { skipWrite: true },
-});
+const rebuild = async () => {
+  const a = Date.now();
 
-b.on("event", async (e) => {
-  if (e.code === "ERROR") {
-    console.error(e.error);
+  try {
+    assets = await build(false);
+  } catch (error: any) {
+    console.error(error);
 
     assets = {
       "index.html": injectWatcher(
-        `<html><head></head><pre>${e.error.message}</pre></html>`,
+        `<html><head></head><pre>${error.message}</pre></html>`,
       ),
     };
-
-    onChange();
   }
 
-  if (e.code === "BUNDLE_END") {
-    const a = Date.now();
+  console.log("rebuilt", Date.now() - a, "ms");
 
-    const { output } = await e.result.generate(rollupOutputOptions);
+  onChange();
+};
+rebuild();
 
-    assets = await bundle(output);
-
-    console.log("re-built", e.duration + (Date.now() - a), "ms");
-
-    onChange();
-  }
-});
+chokidar
+  .watch(__dirname + "/../game/", { ignoreInitial: true })
+  .on("all", (event, path) => {
+    console.log(event, path);
+    rebuild();
+  });
 
 const injectWatcher = (html: string) => {
   function code() {
@@ -94,12 +90,18 @@ Bun.serve({
     if (!content)
       return new Response(injectWatcher("<html><head></head>404</html>"), {
         status: 404,
-        headers: { "content-type": "text/html" },
+        headers: {
+          "content-type": "text/html",
+          "Cache-Control": "no-store, max-age=0",
+        },
       });
 
     if (path.extname(pathname) === ".html")
       return new Response(injectWatcher(content.toString()), {
-        headers: { "content-type": "text/html" },
+        headers: {
+          "content-type": "text/html",
+          "Cache-Control": "no-store, max-age=0",
+        },
       });
 
     return new Response(content);
