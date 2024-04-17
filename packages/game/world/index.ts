@@ -10,35 +10,41 @@ export const setTag = (x: number, tag_mask: number, value: boolean) => {
   return (x & u) + tag_mask * +value;
 };
 
-export const createWorld = (MAX_ENTITIES = 1 << 10) => {
-  const tags = new Uint8Array(MAX_ENTITIES);
+export const MAX_ENTITIES = 1 << 4;
 
-  const position = new Float32Array(MAX_ENTITIES * 2); // as (x,y)
-  const direction = new Float32Array(MAX_ENTITIES * 2); // as (vx,vy)
-  const health = new Uint8Array(MAX_ENTITIES);
-  const hitBoxSize = new Uint8Array(MAX_ENTITIES); // as disk hit box radius
-  const visual = new Uint8Array(MAX_ENTITIES * 4); // as (model, pose_param_1, pose_param_2, pose_param_3)
+export const createWorld = (m = MAX_ENTITIES) => {
+  const tags = new Uint8Array(m);
+
+  const position = new Float32Array(m * 2); // as (x,y)
+  const direction = new Float32Array(m * 2); // as (vx,vy)
+  const health = new Uint8Array(m);
+  const hitBoxSize = new Uint8Array(m); // as disk hit box radius
+  const visual_model = new Uint8Array(m * 4); // as (model, pose_param_1, pose_param_2, pose_param_3)
+  const visual_sprite = new Uint8Array(m); // as sprite_index or 0 for empty
 
   const camera = {
     eye: vec3.create(),
     aspect: 1,
 
     worldMatrix: mat4.create(),
-
-    viewportChanged: true,
   };
 
   const inputs = { keydown: new Set<Key>() };
 
+  // dirty flags
+  const changed = { viewport: true, camera: true };
+
   return {
     dt: 0,
     t: 0,
+    changed,
     tags,
     position,
     direction,
     health,
     hitBoxSize,
-    visual,
+    visual_model,
+    visual_sprite,
     camera,
     inputs,
   };
@@ -69,4 +75,6 @@ export const createEntity = (world: World, i0 = 1) => {
 };
 export const deleteEntity = (world: World, entity: Entity) => {
   world.tags[entity] = 0;
+  world.visual_sprite[entity] = 0;
+  world.visual_model[entity * 4] = 0;
 };

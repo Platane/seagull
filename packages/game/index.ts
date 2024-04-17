@@ -3,6 +3,7 @@ import "./ui/global";
 import { createWorld } from "./world";
 import { update as update_clock } from "./world/systems/clock";
 import { createEventListeners } from "./world/systems/eventListeners";
+import { update as update_spawnEnemy } from "./world/systems/spawnEnemy";
 
 const world = createWorld();
 
@@ -18,7 +19,14 @@ const loop = () => {
   //
 
   update_clock(world);
+  update_spawnEnemy(world);
   update_renderer(world);
+
+  // reset dirty flag
+  for (const k in world.changed) {
+    // @ts-ignore
+    world.changed[k] = false;
+  }
 
   //
   //
@@ -27,7 +35,6 @@ const loop = () => {
 
   //
   //
-
   requestAnimationFrame(loop);
 };
 

@@ -38,7 +38,7 @@ export const createEventListeners = (
   window.addEventListener(
     "resize",
     () => {
-      world.camera.viewportChanged = true;
+      world.changed.viewport = true;
     },
     o,
   );
