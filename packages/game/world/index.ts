@@ -4,13 +4,25 @@ export const TAG_ALIVE = 1 << 0;
 export const TAG_BLUE = 1 << 1;
 
 const TAG_MASK = (1 << 8) - 1;
-export const getTag = (x: number, tag_mask: number) => !!(x & tag_mask);
-export const setTag = (x: number, tag_mask: number, value: boolean) => {
+export const readTag = (x: number, tag_mask: number) => !!(x & tag_mask);
+export const updateTag = (x: number, tag_mask: number, value: boolean) => {
   const u = TAG_MASK ^ tag_mask;
   return (x & u) + tag_mask * +value;
 };
 
-export const MAX_ENTITIES = 1 << 4;
+export const getTag = (world: World, tag_mask: number, entity: Entity) =>
+  readTag(world.tags[entity], tag_mask);
+
+export const setTag = (
+  world: World,
+  tag_mask: number,
+  entity: Entity,
+  value: boolean,
+) => {
+  world.tags[entity] = updateTag(world.tags[entity], tag_mask, value);
+};
+
+export const MAX_ENTITIES = 1 << 11;
 
 export const createWorld = (m = MAX_ENTITIES) => {
   const tags = new Uint8Array(m);
@@ -63,8 +75,8 @@ export type Entity = number & { __opaque_type: "Entity" };
 
 export const createEntity = (world: World, i0 = 1) => {
   for (let i = i0; i < world.tags.length; i++) {
-    if (!getTag(world.tags[i], TAG_ALIVE)) {
-      world.tags[i] = setTag(world.tags[i], TAG_ALIVE, true);
+    if (!readTag(world.tags[i], TAG_ALIVE)) {
+      world.tags[i] = updateTag(world.tags[i], TAG_ALIVE, true);
       return i as Entity;
     }
   }

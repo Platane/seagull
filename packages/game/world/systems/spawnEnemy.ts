@@ -1,4 +1,4 @@
-import { Entity, TAG_BLUE, World, createEntity, setTag } from "..";
+import { Entity, TAG_BLUE, World, createEntity, getTag, setTag } from "..";
 import { setIntoArray2 } from "../../utils/vec2";
 
 const spawnEnemy = (world: World, spriteIndex: 1 | 2 | 3) => {
@@ -12,7 +12,7 @@ const spawnEnemy = (world: World, spriteIndex: 1 | 2 | 3) => {
 
   world.visual_sprite[entity] = spriteIndex;
 
-  setTag(entity, TAG_BLUE, true);
+  setTag(world, TAG_BLUE, entity, true);
 
   return entity;
 };
@@ -21,13 +21,19 @@ let spawned: Entity;
 
 export const update = (world: World) => {
   if (!spawned) {
-    spawned = spawnEnemy(world, 3);
+    for (let i = 500; i--; ) {
+      spawned = spawnEnemy(world, 3);
+    }
   }
 
-  setIntoArray2(
-    world.position,
-    spawned,
-    Math.cos(world.t * 1.2) * 0.5,
-    Math.sin(world.t * 1.2) * 0.5,
-  );
+  for (let entity = world.tags.length as Entity; entity--; ) {
+    if (getTag(world, TAG_BLUE, entity)) {
+      setIntoArray2(
+        world.position,
+        entity,
+        Math.cos(world.t * 1.2 + entity) * 0.5 + (entity % 5) / 5,
+        Math.sin(world.t * 1.2 + entity) * 0.5,
+      );
+    }
+  }
 };
