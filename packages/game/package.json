@@ -1,0 +1,11 @@
+{
+  "name": "@seagull/game",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "gl-matrix": "3.4.3",
+    "@linaria/core": "6.1.0",
+    "park-miller": "2.0.0"
+  }
+}

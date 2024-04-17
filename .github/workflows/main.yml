@@ -1,0 +1,30 @@
+name: main
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+
+      - run: bun install --frozen-lockfile
+
+      # - run: bun test
+
+      - run: bunx biome check .
+
+      - run: bun ./bundle.ts
+        working-directory: packages/game-bundler
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - uses: actions/deploy-pages@v4
+        if: github.ref == 'refs/heads/master'
