@@ -18,8 +18,7 @@ jobs:
 
       - run: bunx biome check .
 
-      - run: bun ./bundle.ts
-        working-directory: packages/game-bundler
+      - run: bun ./packages/game-bundler/bundle.ts
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
