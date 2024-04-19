@@ -5,7 +5,6 @@ import { createProgram } from "../../utils/program";
 import codeFrag from "./shader.frag";
 import codeVert from "./shader.vert";
 import { textureAtlasCanvas } from "./textureAtlas";
-import { update } from "./update";
 
 const program = createProgram(gl, codeVert, codeFrag);
 
@@ -13,6 +12,8 @@ const program = createProgram(gl, codeVert, codeFrag);
 // uniforms
 //
 const u_texture = getUniformLocation(gl, program, "u_texture");
+
+const u_matrix = gl.getUniformLocation(program, "u_matrix");
 
 //
 // attributes
@@ -59,14 +60,18 @@ gl.generateMipmap(gl.TEXTURE_2D);
 //
 gl.bindVertexArray(null);
 
-export const positions = new Float32Array(MAX_ENTITIES * 2 * 3 * 3);
-export const uvs = new Float32Array(MAX_ENTITIES * 2 * 3 * 2);
+const MAX_SPRITES = MAX_ENTITIES;
+
+export const positions = new Float32Array(MAX_SPRITES * 2 * 3 * 3);
+export const uvs = new Float32Array(MAX_SPRITES * 2 * 3 * 2);
 export const sprite = { count: 0 };
 
 export const draw = (world: World) => {
   gl.useProgram(program);
 
   gl.bindVertexArray(vao);
+
+  gl.uniformMatrix4fv(u_matrix, false, world.camera.worldMatrix);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);

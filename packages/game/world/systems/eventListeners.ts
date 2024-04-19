@@ -43,5 +43,15 @@ export const createEventListeners = (
     o,
   );
 
+  document.getElementById("zoom-input")?.addEventListener(
+    "input",
+    (e) => {
+      const zoom = +(e.target as any).value;
+      world.camera.eye[2] = zoom;
+      world.changed.camera = true;
+    },
+    o,
+  );
+
   return () => cleanupController.abort();
 };

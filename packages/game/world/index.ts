@@ -1,4 +1,5 @@
 import { mat4, vec3 } from "gl-matrix";
+import { lookAtPoint } from "./systems/cameraUpdate";
 
 export const TAG_ALIVE = 1 << 0;
 export const TAG_BLUE = 1 << 1;
@@ -36,10 +37,13 @@ export const createWorld = (m = MAX_ENTITIES) => {
 
   const camera = {
     eye: vec3.create(),
+    lookAtPoint: vec3.create(),
     aspect: 1,
 
     worldMatrix: mat4.create(),
   };
+  vec3.set(camera.eye, 0, 0, 2);
+  vec3.set(camera.lookAtPoint, 0, 0, 0);
 
   const inputs = { keydown: new Set<Key>() };
 
@@ -49,6 +53,7 @@ export const createWorld = (m = MAX_ENTITIES) => {
   return {
     dt: 0,
     t: 0,
+    player: 0 as Entity,
     changed,
     tags,
     position,
@@ -67,7 +72,11 @@ export type Key =
   | "ArrowLeft"
   | "ArrowRight"
   | "ArrowDown"
-  | "Space";
+  | "Space"
+  | "A"
+  | "B"
+  | "X"
+  | "Y";
 
 export type World = ReturnType<typeof createWorld>;
 

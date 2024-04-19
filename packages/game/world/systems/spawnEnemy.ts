@@ -21,7 +21,7 @@ let spawned: Entity;
 
 export const update = (world: World) => {
   if (!spawned) {
-    for (let i = 500; i--; ) {
+    for (let i = 10; i--; ) {
       spawned = spawnEnemy(world, 3);
     }
   }
@@ -31,8 +31,10 @@ export const update = (world: World) => {
       setIntoArray2(
         world.position,
         entity,
-        Math.cos(world.t * 1.2 + entity) * 0.5 + (entity % 5) / 5,
-        Math.sin(world.t * 1.2 + entity) * 0.5,
+        Math.cos(world.t * 1.2 * (1 + (entity % 8) / 8) + entity) * 0.5 +
+          (entity ** 2 % 100) / 100 -
+          0.5,
+        Math.sin(world.t * 1.2 * (1 + (entity % 8) / 8) + entity) * 0.5,
       );
     }
   }
