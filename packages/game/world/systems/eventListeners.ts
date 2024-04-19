@@ -1,5 +1,17 @@
 import type { Key, World } from "..";
 
+const keyMap: Record<string, Key> = {
+  ArrowUp: "arrow_up",
+  ArrowDown: "arrow_down",
+  ArrowLeft: "arrow_left",
+  ArrowRight: "arrow_right",
+
+  w: "arrow_up",
+  s: "arrow_down",
+  a: "arrow_left",
+  d: "arrow_right",
+};
+
 export const createEventListeners = (
   world: World,
   containerElement: HTMLElement = document.body,
@@ -12,7 +24,7 @@ export const createEventListeners = (
   containerElement.addEventListener(
     "keydown",
     (event) => {
-      const key = (event.key === " " && "Space") || (event.key as Key);
+      const key = keyMap[event.key];
       world.inputs.keydown.add(key);
     },
     o,
@@ -21,13 +33,13 @@ export const createEventListeners = (
   containerElement.addEventListener(
     "keyup",
     (event) => {
-      const key = (event.key === " " && "Space") || (event.key as Key);
+      const key = keyMap[event.key];
       world.inputs.keydown.delete(key);
     },
     o,
   );
 
-  containerElement.addEventListener(
+  window.addEventListener(
     "blur",
     () => {
       world.inputs.keydown.clear();
@@ -37,6 +49,14 @@ export const createEventListeners = (
 
   window.addEventListener(
     "resize",
+    () => {
+      world.changed.viewport = true;
+    },
+    o,
+  );
+
+  window.addEventListener(
+    "mousemove",
     () => {
       world.changed.viewport = true;
     },

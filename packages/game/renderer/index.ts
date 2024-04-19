@@ -20,11 +20,11 @@ export const update = (world: World) => {
   }
 };
 
-gl.enable(gl.DEPTH_TEST);
-gl.depthFunc(gl.LESS);
-
 export const draw = (world: World) => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LESS);
 
   draw_gizmo(world);
   update_sprites(world);

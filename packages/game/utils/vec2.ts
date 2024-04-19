@@ -1,5 +1,8 @@
 import { vec2 } from "gl-matrix";
 
+export const getFromArray2 = (arr: TypedArray, i: number) =>
+  arr.subarray(i * 2, (i + 1) * 2);
+
 export const copyFromArray2 = (out: vec2, arr: ArrayLike<number>, i: number) =>
   vec2.set(out, arr[i * 2 + 0], arr[i * 2 + 1]);
 

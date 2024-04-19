@@ -21,11 +21,12 @@ export const update = (world: World) => {
       copyFromArray2(t as any, world.position, entity);
 
       const s = 0.5;
+      const z = -j * 0.001 - 0.001;
 
-      vec3.set(a, -s, -s, 0);
-      vec3.set(b, +s, -s, 0);
-      vec3.set(c, +s, +s, 0);
-      vec3.set(d, -s, +s, 0);
+      vec3.set(a, -s, -s, z);
+      vec3.set(b, +s, -s, z);
+      vec3.set(c, +s, +s, z);
+      vec3.set(d, -s, +s, z);
 
       vec3.add(a, a, t);
       vec3.add(b, b, t);

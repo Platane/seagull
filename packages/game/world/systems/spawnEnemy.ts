@@ -20,6 +20,14 @@ const spawnEnemy = (world: World, spriteIndex: 1 | 2 | 3) => {
 let spawned: Entity;
 
 export const update = (world: World) => {
+  if (!world.player) {
+    const entity = createEntity(world);
+    world.player = entity;
+
+    world.visual_sprite[entity] = 2;
+    world.camera.following = entity;
+  }
+
   if (!spawned) {
     for (let i = 10; i--; ) {
       spawned = spawnEnemy(world, 3);
