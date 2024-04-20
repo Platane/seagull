@@ -2,6 +2,7 @@ import { draw, update as update_renderer } from "./renderer";
 import { update as update_fullscreen } from "./ui/fullscreen";
 import "./ui/global";
 import { update as update_ui_mobile_control_leftStick } from "./ui/mobile-control-leftStick";
+import { update as update_ui_mobile_control_leftRight } from "./ui/mobile-control-rightStick";
 import { createWorld } from "./world";
 import { update as update_applyVelocity } from "./world/systems/applyVelocity";
 import { update as update_camera } from "./world/systems/cameraUpdate";

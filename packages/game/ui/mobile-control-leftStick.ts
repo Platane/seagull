@@ -1,9 +1,10 @@
 import { css } from "@linaria/core";
 import { vec2 } from "gl-matrix";
+import { canvas } from "../renderer/canvas";
 import { World } from "../world";
 
-const containerElement = document.createElement("div");
-const containerClassName = css`
+const leftStickContainerElement = document.createElement("div");
+const leftStickContainerClassName = css`
 position: absolute;
 bottom: 20px;
 left: 20px;
@@ -14,10 +15,10 @@ border: solid 20px #ddda;
 
 
 `;
-containerElement.className = containerClassName;
+leftStickContainerElement.className = leftStickContainerClassName;
 
-const stickElement = document.createElement("div");
-const stickClassName = css`
+const leftStickDotElement = document.createElement("div");
+const leftStickDotClassName = css`
 position: absolute;
 top:  50% ;
 left:  50% ;
@@ -28,14 +29,14 @@ background-color: #ccca;
 transform:translate(-50%,-50%);
 
 `;
-stickElement.classList.add(stickClassName);
+leftStickDotElement.classList.add(leftStickDotClassName);
 
-containerElement.appendChild(stickElement);
+leftStickContainerElement.appendChild(leftStickDotElement);
 
 const updateDom = (dir: vec2) => {
-  const s = containerElement.offsetWidth / 2 - 10;
+  const s = leftStickContainerElement.offsetWidth / 2 - 10;
 
-  stickElement.style.transform =
+  leftStickDotElement.style.transform =
     "translate(" +
     `calc(-50% + ${dir[0] * s}px)` +
     "," +
@@ -45,12 +46,16 @@ const updateDom = (dir: vec2) => {
 
 let remove: (() => void) | undefined;
 
-export const update = (world: World) => {
-  if (world.inputs.type === "mobile" && !remove) {
-    const a = new AbortController();
+const init = (world: World) => {
+  const a = new AbortController();
+  const o = { signal: a.signal };
+
+  //
+  // left stick
+  {
     let touchId: undefined | number;
-    document.body.appendChild(containerElement);
-    containerElement.addEventListener(
+    document.body.appendChild(leftStickContainerElement);
+    leftStickContainerElement.addEventListener(
       "touchmove",
       (e) => {
         const touch = Array.from(e.changedTouches).find(
@@ -62,13 +67,14 @@ export const update = (world: World) => {
         const { pageX, pageY } = touch;
         const x =
           pageX -
-          (containerElement.offsetLeft + containerElement.offsetWidth / 2);
+          (leftStickContainerElement.offsetLeft +
+            leftStickContainerElement.offsetWidth / 2);
         const y =
-          containerElement.offsetTop +
-          containerElement.offsetHeight / 2 -
+          leftStickContainerElement.offsetTop +
+          leftStickContainerElement.offsetHeight / 2 -
           pageY;
 
-        const s = containerElement.offsetWidth / 2;
+        const s = leftStickContainerElement.offsetWidth / 2;
         const l = Math.hypot(x, y);
 
         const m = Math.max(s, l);
@@ -77,9 +83,9 @@ export const update = (world: World) => {
 
         updateDom(world.inputs.leftDirection);
       },
-      { signal: a.signal },
+      o,
     );
-    containerElement.addEventListener(
+    leftStickContainerElement.addEventListener(
       "touchstart",
       (e) => {
         if (!touchId) {
@@ -87,9 +93,9 @@ export const update = (world: World) => {
           navigator.vibrate(50);
         }
       },
-      { signal: a.signal },
+      o,
     );
-    containerElement.addEventListener(
+    leftStickContainerElement.addEventListener(
       "touchend",
       (e) => {
         if (
@@ -100,12 +106,69 @@ export const update = (world: World) => {
           updateDom(world.inputs.leftDirection);
         }
       },
-      { signal: a.signal },
+      o,
     );
-    remove = () => {
-      document.body.removeChild(containerElement);
-      a.abort();
-    };
+  }
+
+  //
+  // primary
+  {
+    let touchId: undefined | number;
+    canvas.addEventListener("touchstart", (e) => {
+      if (!touchId) {
+        touchId = e.changedTouches[0].identifier;
+        world.inputs.keydown.add("primary");
+      }
+    });
+    canvas.addEventListener(
+      "touchmove",
+      (e) => {
+        const touch = Array.from(e.changedTouches).find(
+          (t) => t.identifier === touchId,
+        );
+
+        if (!touch) return;
+
+        const { pageX, pageY } = touch;
+        const x = pageX - (canvas.offsetLeft + canvas.offsetWidth / 2);
+        const y = canvas.offsetTop + canvas.offsetHeight / 2 - pageY;
+
+        vec2.set(world.inputs.rightDirection, x, y);
+
+        const l = vec2.len(world.inputs.rightDirection);
+
+        if (l > 0)
+          vec2.scale(
+            world.inputs.rightDirection,
+            world.inputs.rightDirection,
+            1 / l,
+          );
+      },
+      o,
+    );
+    canvas.addEventListener(
+      "touchend",
+      (e) => {
+        if (
+          Array.from(e.changedTouches).some((t) => t.identifier === touchId)
+        ) {
+          touchId = undefined;
+          world.inputs.keydown.delete("primary");
+        }
+      },
+      o,
+    );
+  }
+
+  return () => {
+    document.body.removeChild(leftStickContainerElement);
+    a.abort();
+  };
+};
+
+export const update = (world: World) => {
+  if (world.inputs.type === "mobile" && !remove) {
+    remove = init(world);
   }
 
   if (world.inputs.type !== "mobile" && remove) {
