@@ -50,6 +50,7 @@ export const createRollupInputOptions = (production: boolean) => {
       }),
 
       linaria({
+        include: [path.resolve(__dirname, "..", "game", "ui") + "/**/*.ts"],
         extensions: [".ts"],
         evaluate: false,
         babelOptions: {
@@ -63,7 +64,7 @@ export const createRollupInputOptions = (production: boolean) => {
       }),
 
       esbuild({
-        include: ["**/*.ts", "ui/**/*.ts"],
+        include: ["**/*.ts"],
         exclude: /node_modules/,
         sourceMap: false,
         target: "es2022",
