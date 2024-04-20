@@ -18,6 +18,8 @@ jobs:
 
       - run: bunx biome check .
 
+      - run: bunx tsc --noEmit
+
       - run: bun ./packages/game-bundler/bundle.ts
 
       - name: Upload artifact
