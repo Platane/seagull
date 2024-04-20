@@ -1,7 +1,7 @@
 import { mat4, vec2, vec3 } from "gl-matrix";
 
 export const TAG_ALIVE = 1 << 0;
-export const TAG_BLUE = 1 << 1;
+export const RUSHING_ENEMY = 1 << 1;
 
 const TAG_MASK = (1 << 8) - 1;
 export const readTag = (x: number, tag_mask: number) => !!(x & tag_mask);
