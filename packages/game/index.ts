@@ -19,9 +19,10 @@ const world = createWorld();
 
 createEventListeners(world);
 
-let lastDate = Date.now();
+let lastDate = 0;
 const loop = () => {
   const now = Date.now();
+  lastDate = lastDate || now;
   world.dt = (now - lastDate) / 1000;
   lastDate = now;
 
