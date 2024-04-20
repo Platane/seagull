@@ -2,8 +2,6 @@ import { vec2 } from "gl-matrix";
 import { World } from "..";
 import { getFromArray2 } from "../../utils/vec2";
 
-const velocity = vec2.create();
-
 export const update = (world: World) => {
   if (!world.player) return;
 
@@ -13,6 +11,7 @@ export const update = (world: World) => {
   }
 
   {
+    const velocity = getFromArray2(world.velocity, world.player);
     if (world.inputs.type === "keyboard_mouse") {
       velocity[0] = 0;
       velocity[1] = 0;
@@ -29,10 +28,5 @@ export const update = (world: World) => {
     } else {
       vec2.copy(velocity, world.inputs.leftDirection);
     }
-
-    const p = getFromArray2(world.position, world.player);
-
-    p[0] += velocity[0] * 1.8 * world.dt;
-    p[1] += velocity[1] * 1.8 * world.dt;
   }
 };

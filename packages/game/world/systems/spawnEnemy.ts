@@ -34,7 +34,7 @@ export const update = (world: World) => {
     }
   }
 
-  for (let entity = world.tags.length as Entity; entity--; ) {
+  for (let entity = world.entityPoolSize as Entity; entity--; ) {
     if (getTag(world, TAG_BLUE, entity)) {
       setIntoArray2(
         world.position,

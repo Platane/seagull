@@ -15,7 +15,7 @@ const t = vec3.create();
 export const update = (world: World) => {
   let j = 0;
 
-  for (let entity = 1; entity < world.tags.length; entity++) {
+  for (let entity = 1; entity < world.entityPoolSize; entity++) {
     const i = world.visual_sprite[entity];
     if (i !== 0) {
       const s = 0.5;

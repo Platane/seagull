@@ -3,6 +3,7 @@ import { update as update_fullscreen } from "./ui/fullscreen";
 import "./ui/global";
 import { update as update_ui_mobile_control_leftStick } from "./ui/mobile-control-leftStick";
 import { createWorld } from "./world";
+import { update as update_applyVelocity } from "./world/systems/applyVelocity";
 import { update as update_camera } from "./world/systems/cameraUpdate";
 import { update as update_wobble } from "./world/systems/cameraWobble";
 import { update as update_clock } from "./world/systems/clock";
@@ -28,6 +29,7 @@ const loop = () => {
   update_renderer(world);
   update_wobble(world);
   update_playerMovement(world);
+  update_applyVelocity(world);
 
   update_fullscreen(world);
   update_ui_mobile_control_leftStick(world);

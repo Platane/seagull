@@ -26,4 +26,13 @@ export const updateCamera = (world: World) => {
   }
 };
 
-export const update = updateCamera;
+export const update = (world: World) => {
+  if (world.camera.following) {
+    world.camera.lookAtPoint[0] =
+      world.position[world.camera.following * 2 + 0];
+    world.camera.lookAtPoint[1] =
+      world.position[world.camera.following * 2 + 1];
+  }
+
+  updateCamera(world);
+};

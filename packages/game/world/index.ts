@@ -28,7 +28,8 @@ export const createWorld = (m = MAX_ENTITIES) => {
   const tags = new Uint8Array(m);
 
   const position = new Float32Array(m * 2); // as (x,y)
-  const direction = new Float32Array(m * 2); // as (vx,vy)
+  const direction = new Float32Array(m * 2); // as (dx,dy)
+  const velocity = new Float32Array(m * 2); // as (vx,vy)
   const health = new Uint8Array(m);
   const hitBoxSize = new Uint8Array(m); // as disk hit box radius
   const visual_model = new Uint8Array(m * 4); // as (model, pose_param_1, pose_param_2, pose_param_3)
@@ -47,7 +48,7 @@ export const createWorld = (m = MAX_ENTITIES) => {
   vec3.set(camera.lookAtPoint, 0, 0, 0);
 
   const inputs = {
-    type: ("ontouchstart" in document.documentElement || true
+    type: ("ontouchstart" in document.documentElement
       ? "mobile"
       : "keyboard_mouse") as "keyboard_mouse" | "gamepad" | "mobile",
     keyMap: {
@@ -73,9 +74,11 @@ export const createWorld = (m = MAX_ENTITIES) => {
     dt: 0,
     t: 0,
     player: 0 as Entity,
+    entityPoolSize: MAX_ENTITIES,
     changed,
     tags,
     position,
+    velocity,
     direction,
     health,
     hitBoxSize,
@@ -114,4 +117,6 @@ export const deleteEntity = (world: World, entity: Entity) => {
   world.tags[entity] = 0;
   world.visual_sprite[entity] = 0;
   world.visual_model[entity * 4] = 0;
+  world.velocity[entity * 2 + 0] = 0;
+  world.velocity[entity * 2 + 1] = 0;
 };
