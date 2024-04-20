@@ -1,6 +1,6 @@
 import { vec3 } from "gl-matrix";
 import { copyFromArray2, setIntoArray2 } from "../../../utils/vec2";
-import { copyIntoArray3 } from "../../../utils/vec3";
+import { ZERO, copyIntoArray3 } from "../../../utils/vec3";
 import type { World } from "../../../world";
 import { positions, sprite, uvs } from "./draw";
 import { N_SPRITES } from "./textureAtlas";
@@ -18,8 +18,6 @@ export const update = (world: World) => {
   for (let entity = 1; entity < world.tags.length; entity++) {
     const i = world.visual_sprite[entity];
     if (i !== 0) {
-      copyFromArray2(t as any, world.position, entity);
-
       const s = 0.5;
       const z = -j * 0.001 - 0.001;
 
@@ -28,10 +26,27 @@ export const update = (world: World) => {
       vec3.set(c, +s, +s, z);
       vec3.set(d, -s, +s, z);
 
-      vec3.add(a, a, t);
-      vec3.add(b, b, t);
-      vec3.add(c, c, t);
-      vec3.add(d, d, t);
+      {
+        const dx = world.direction[entity * 2 + 0];
+        const dy = world.direction[entity * 2 + 1];
+
+        const l = Math.hypot(dx, dy);
+
+        const angle = l > 0 ? Math.atan2(dx / l, dy / l) + Math.PI : 0;
+
+        vec3.rotateZ(a, a, ZERO, angle);
+        vec3.rotateZ(b, b, ZERO, angle);
+        vec3.rotateZ(c, c, ZERO, angle);
+        vec3.rotateZ(d, d, ZERO, angle);
+      }
+
+      {
+        copyFromArray2(t as any, world.position, entity);
+        vec3.add(a, a, t);
+        vec3.add(b, b, t);
+        vec3.add(c, c, t);
+        vec3.add(d, d, t);
+      }
 
       //  A
       //    (5)        (4)           B

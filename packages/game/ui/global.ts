@@ -12,6 +12,7 @@ export const globalClassName = css`
   html {
     margin:0;
     font-family: Helvetica,Arial,sans-serif;
+    overflow: hidden;
   }
 
   body {

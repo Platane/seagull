@@ -47,6 +47,20 @@ export const createWorld = (m = MAX_ENTITIES) => {
   vec3.set(camera.lookAtPoint, 0, 0, 0);
 
   const inputs = {
+    type: ("ontouchstart" in document.documentElement || true
+      ? "mobile"
+      : "keyboard_mouse") as "keyboard_mouse" | "gamepad" | "mobile",
+    keyMap: {
+      ArrowUp: "arrow_up",
+      ArrowDown: "arrow_down",
+      ArrowLeft: "arrow_left",
+      ArrowRight: "arrow_right",
+
+      w: "arrow_up",
+      s: "arrow_down",
+      a: "arrow_left",
+      d: "arrow_right",
+    } as Record<string, Key>,
     keydown: new Set<Key>(),
     leftDirection: vec2.create(),
     rightDirection: vec2.create(),

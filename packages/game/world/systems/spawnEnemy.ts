@@ -29,7 +29,7 @@ export const update = (world: World) => {
   }
 
   if (!spawned) {
-    for (let i = 10; i--; ) {
+    for (let i = 0; i--; ) {
       spawned = spawnEnemy(world, 3);
     }
   }

@@ -1,5 +1,7 @@
 import { draw, update as update_renderer } from "./renderer";
+import { update as update_fullscreen } from "./ui/fullscreen";
 import "./ui/global";
+import { update as update_ui_mobile_control_leftStick } from "./ui/mobile-control-leftStick";
 import { createWorld } from "./world";
 import { update as update_camera } from "./world/systems/cameraUpdate";
 import { update as update_wobble } from "./world/systems/cameraWobble";
@@ -26,6 +28,9 @@ const loop = () => {
   update_renderer(world);
   update_wobble(world);
   update_playerMovement(world);
+
+  update_fullscreen(world);
+  update_ui_mobile_control_leftStick(world);
 
   update_camera(world);
 

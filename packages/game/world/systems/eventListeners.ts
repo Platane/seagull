@@ -1,16 +1,5 @@
+import { vec2 } from "gl-matrix";
 import type { Key, World } from "..";
-
-const keyMap: Record<string, Key> = {
-  ArrowUp: "arrow_up",
-  ArrowDown: "arrow_down",
-  ArrowLeft: "arrow_left",
-  ArrowRight: "arrow_right",
-
-  w: "arrow_up",
-  s: "arrow_down",
-  a: "arrow_left",
-  d: "arrow_right",
-};
 
 export const createEventListeners = (
   world: World,
@@ -24,7 +13,7 @@ export const createEventListeners = (
   containerElement.addEventListener(
     "keydown",
     (event) => {
-      const key = keyMap[event.key];
+      const key = world.inputs.keyMap[event.key];
       world.inputs.keydown.add(key);
     },
     o,
@@ -33,7 +22,7 @@ export const createEventListeners = (
   containerElement.addEventListener(
     "keyup",
     (event) => {
-      const key = keyMap[event.key];
+      const key = world.inputs.keyMap[event.key];
       world.inputs.keydown.delete(key);
     },
     o,
@@ -57,8 +46,19 @@ export const createEventListeners = (
 
   window.addEventListener(
     "mousemove",
-    () => {
-      world.changed.viewport = true;
+    (e) => {
+      const x =
+        ((e.pageX - containerElement.clientLeft) /
+          containerElement.clientWidth -
+          0.5) *
+        2;
+      const y =
+        ((e.pageY - containerElement.clientTop) /
+          containerElement.clientHeight -
+          0.5) *
+        2;
+
+      vec2.set(world.inputs.rightDirection, x, y);
     },
     o,
   );
@@ -72,6 +72,7 @@ export const createEventListeners = (
     },
     o,
   );
+
 
   return () => cleanupController.abort();
 };
