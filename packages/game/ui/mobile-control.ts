@@ -216,7 +216,9 @@ const init = (world: World) => {
 
   document.documentElement.requestFullscreen();
 
-  screen.orientation.lock?.("landscape");
+  (screen.orientation as { lock?: (o: string) => Promise<void> }).lock?.(
+    "landscape",
+  );
 
   return () => {
     document.body.removeChild(leftStickContainerElement);
