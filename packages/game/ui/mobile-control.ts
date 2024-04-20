@@ -4,21 +4,18 @@ import { canvas } from "../renderer/canvas";
 import { World } from "../world";
 
 const leftStickContainerElement = document.createElement("div");
-const leftStickContainerClassName = css`
+leftStickContainerElement.className = css`
 position: absolute;
 bottom: 20px;
 left: 20px;
-width: min(max( 200px, 25vw, 25vh ), calc( 50vw - 40px ) , calc( 50vh - 40px ) );
+width: min(max( 200px, 25vw, 25vh ), calc( 50vw - 30px ) , calc( 50vh - 30px ) );
 aspect-ratio: 1;
 border-radius: 50%;
 border: solid 20px #ddda;
-
-
 `;
-leftStickContainerElement.className = leftStickContainerClassName;
 
 const leftStickDotElement = document.createElement("div");
-const leftStickDotClassName = css`
+leftStickDotElement.className = css`
 position: absolute;
 top:  50% ;
 left:  50% ;
@@ -27,9 +24,7 @@ aspect-ratio: 1;
 border-radius: 50%;
 background-color: #ccca;
 transform:translate(-50%,-50%);
-
 `;
-leftStickDotElement.classList.add(leftStickDotClassName);
 
 leftStickContainerElement.appendChild(leftStickDotElement);
 
@@ -43,6 +38,36 @@ const updateDom = (dir: vec2) => {
     `calc(-50% - ${dir[1] * s}px)` +
     ")";
 };
+
+const rightContainerElement = document.createElement("div");
+rightContainerElement.className = css`
+position: absolute;
+bottom: 20px;
+right: 20px;
+width: min(max( 200px, 25vw, 25vh ), calc( 50vw - 30px ) , calc( 50vh - 30px ) );
+aspect-ratio: 1;
+pointer-events: none;
+
+`;
+const secondaryButtonElement = document.createElement("button");
+secondaryButtonElement.className = css`
+all:unset;
+position: absolute;
+top:  50% ;
+left:  50% ;
+width: 60px;
+aspect-ratio: 1;
+border-radius: 50%;
+background-color: #ccca;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 30px;
+line-height: 30px;
+pointer-events: auto;
+`;
+secondaryButtonElement.textContent = "B";
+rightContainerElement.appendChild(secondaryButtonElement);
 
 let remove: (() => void) | undefined;
 
@@ -114,38 +139,40 @@ const init = (world: World) => {
   // primary
   {
     let touchId: undefined | number;
+    document.body.appendChild(rightContainerElement);
+
+    const onMove = (e: TouchEvent) => {
+      const touch = Array.from(e.changedTouches).find(
+        (t) => t.identifier === touchId,
+      );
+
+      if (!touch) return;
+
+      const { pageX, pageY } = touch;
+      const x = pageX - (canvas.offsetLeft + canvas.offsetWidth / 2);
+      const y = canvas.offsetTop + canvas.offsetHeight / 2 - pageY;
+
+      vec2.set(world.inputs.rightDirection, x, y);
+
+      const l = vec2.len(world.inputs.rightDirection);
+
+      if (l > 0)
+        vec2.scale(
+          world.inputs.rightDirection,
+          world.inputs.rightDirection,
+          1 / l,
+        );
+    };
+
     canvas.addEventListener("touchstart", (e) => {
       if (!touchId) {
         touchId = e.changedTouches[0].identifier;
         world.inputs.keydown.add("primary");
+
+        onMove(e);
       }
     });
-    canvas.addEventListener(
-      "touchmove",
-      (e) => {
-        const touch = Array.from(e.changedTouches).find(
-          (t) => t.identifier === touchId,
-        );
-
-        if (!touch) return;
-
-        const { pageX, pageY } = touch;
-        const x = pageX - (canvas.offsetLeft + canvas.offsetWidth / 2);
-        const y = canvas.offsetTop + canvas.offsetHeight / 2 - pageY;
-
-        vec2.set(world.inputs.rightDirection, x, y);
-
-        const l = vec2.len(world.inputs.rightDirection);
-
-        if (l > 0)
-          vec2.scale(
-            world.inputs.rightDirection,
-            world.inputs.rightDirection,
-            1 / l,
-          );
-      },
-      o,
-    );
+    canvas.addEventListener("touchmove", onMove, o);
     canvas.addEventListener(
       "touchend",
       (e) => {
@@ -160,8 +187,34 @@ const init = (world: World) => {
     );
   }
 
+  //
+  // secondary
+  {
+    let touchId: undefined | number;
+    document.body.appendChild(rightContainerElement);
+    secondaryButtonElement.addEventListener("touchstart", (e) => {
+      if (!touchId) {
+        touchId = e.changedTouches[0].identifier;
+        world.inputs.keydown.add("secondary");
+      }
+    });
+    secondaryButtonElement.addEventListener(
+      "touchend",
+      (e) => {
+        if (
+          Array.from(e.changedTouches).some((t) => t.identifier === touchId)
+        ) {
+          touchId = undefined;
+          world.inputs.keydown.delete("secondary");
+        }
+      },
+      o,
+    );
+  }
+
   return () => {
     document.body.removeChild(leftStickContainerElement);
+    document.body.removeChild(rightContainerElement);
     a.abort();
   };
 };

@@ -47,6 +47,8 @@ export const createEventListeners = (
   window.addEventListener(
     "mousemove",
     (e) => {
+      if (world.inputs.type !== "keyboard_mouse") return;
+
       const x =
         ((e.pageX - containerElement.clientLeft) /
           containerElement.clientWidth -
@@ -66,6 +68,8 @@ export const createEventListeners = (
   window.addEventListener(
     "mousedown",
     (e) => {
+      if (world.inputs.type !== "keyboard_mouse") return;
+
       const key = ((e.button === 0 && "primary") ||
         (e.button === 2 && "secondary")) as Key;
 
@@ -77,6 +81,8 @@ export const createEventListeners = (
   window.addEventListener(
     "mouseup",
     (e) => {
+      if (world.inputs.type !== "keyboard_mouse") return;
+
       const key = ((e.button === 0 && "primary") ||
         (e.button === 2 && "secondary")) as Key;
 

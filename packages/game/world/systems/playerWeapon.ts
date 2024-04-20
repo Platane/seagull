@@ -37,6 +37,6 @@ export const update = (world: World) => {
     world.visual_sprite[bullet] = 5;
 
     world.playerCooldown.primary = 0.3;
-    navigator.vibrate(80);
+    navigator.vibrate(20);
   }
 };
