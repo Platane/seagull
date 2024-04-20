@@ -9,6 +9,7 @@ import { update as update_applyVelocity } from "./world/systems/applyVelocity";
 import { update as update_camera } from "./world/systems/cameraUpdate";
 import { update as update_cameraWobble } from "./world/systems/cameraWobble";
 import { update as update_clock } from "./world/systems/clock";
+import { update as update_collisionResolution } from "./world/systems/collisionResolution";
 import { update as update_enemyMovement } from "./world/systems/enemyMovement";
 import { createEventListeners } from "./world/systems/eventListeners";
 import { update as update_playerMovement } from "./world/systems/playerMovement";
@@ -36,6 +37,8 @@ const loop = () => {
 
   update_playerMovement(world);
   update_playerWeapon(world);
+
+  update_collisionResolution(world);
 
   update_applyVelocity(world);
 

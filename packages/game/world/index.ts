@@ -31,7 +31,7 @@ export const createWorld = (m = MAX_ENTITIES) => {
   const direction = new Float32Array(m * 2); // as (dx,dy)
   const velocity = new Float32Array(m * 2); // as (vx,vy)
   const health = new Uint8Array(m);
-  const hitBoxSize = new Uint8Array(m); // as disk hit box radius
+  const hitBoxSize = new Float32Array(m); // as disk hit box radius
   const visual_model = new Uint8Array(m * 4); // as (model, pose_param_1, pose_param_2, pose_param_3)
   const visual_sprite = new Uint8Array(m); // as sprite_index or 0 for empty
 
@@ -120,4 +120,6 @@ export const deleteEntity = (world: World, entity: Entity) => {
   world.visual_model[entity * 4] = 0;
   world.velocity[entity * 2 + 0] = 0;
   world.velocity[entity * 2 + 1] = 0;
+  world.hitBoxSize[entity] = 0;
+  world.health[entity] = 0;
 };
