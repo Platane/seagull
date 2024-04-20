@@ -6,12 +6,12 @@ import { World } from "../world";
 const leftStickContainerElement = document.createElement("div");
 leftStickContainerElement.className = css`
 position: absolute;
-bottom: 20px;
-left: 20px;
-width: min(max( 200px, 25vw, 25vh ), calc( 50vw - 30px ) , calc( 50vh - 30px ) );
+bottom: 16px;
+left: 16px;
+width: min(max( 160px, 20vw, 20vh ), calc( 50vw - 24px ) , calc( 50vh - 24px ) );
 aspect-ratio: 1;
 border-radius: 50%;
-border: solid 20px #ddda;
+border: solid 16px #ddda;
 z-index: 2;
 `;
 
@@ -30,7 +30,7 @@ transform:translate(-50%,-50%);
 leftStickContainerElement.appendChild(leftStickDotElement);
 
 const updateDom = (dir: vec2) => {
-  const s = leftStickContainerElement.offsetWidth / 2 - 10;
+  const s = leftStickContainerElement.offsetWidth / 2 - 8;
 
   leftStickDotElement.style.transform =
     "translate(" +
@@ -214,9 +214,15 @@ const init = (world: World) => {
     );
   }
 
+  document.documentElement.requestFullscreen();
+
+  screen.orientation.lock?.("landscape");
+
   return () => {
     document.body.removeChild(leftStickContainerElement);
     document.body.removeChild(rightContainerElement);
+    document.exitFullscreen();
+    screen.orientation.unlock();
     a.abort();
   };
 };
