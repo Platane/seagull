@@ -58,7 +58,37 @@ export const createEventListeners = (
           0.5) *
         2;
 
-      vec2.set(world.inputs.rightDirection, x, y);
+      vec2.set(world.inputs.rightDirection, x, -y);
+    },
+    o,
+  );
+
+  window.addEventListener(
+    "mousedown",
+    (e) => {
+      const key = ((e.button === 0 && "primary") ||
+        (e.button === 2 && "secondary")) as Key;
+
+      world.inputs.keydown.add(key);
+    },
+    o,
+  );
+
+  window.addEventListener(
+    "mouseup",
+    (e) => {
+      const key = ((e.button === 0 && "primary") ||
+        (e.button === 2 && "secondary")) as Key;
+
+      world.inputs.keydown.delete(key);
+    },
+    o,
+  );
+
+  window.addEventListener(
+    "contextmenu",
+    (e) => {
+      e.preventDefault();
     },
     o,
   );
@@ -72,7 +102,6 @@ export const createEventListeners = (
     },
     o,
   );
-
 
   return () => cleanupController.abort();
 };

@@ -26,6 +26,17 @@ export const update = (world: World) => {
 
     world.visual_sprite[entity] = 2;
     world.camera.following = entity;
+
+    // spawn tree
+
+    for (let i = 10; i--; ) {
+      const entity = createEntity(world);
+
+      world.position[entity * 2 + 0] = Math.random() * 10 - 5;
+      world.position[entity * 2 + 1] = Math.random() * 10 - 5;
+
+      world.visual_sprite[entity] = 4;
+    }
   }
 
   if (!spawned) {

@@ -44,7 +44,7 @@ export const createWorld = (m = MAX_ENTITIES) => {
 
     worldMatrix: mat4.create(),
   };
-  vec3.set(camera.eye, 0, 0, 2);
+  vec3.set(camera.eye, 0, 0, 5);
   vec3.set(camera.lookAtPoint, 0, 0, 0);
 
   const inputs = {
@@ -74,6 +74,7 @@ export const createWorld = (m = MAX_ENTITIES) => {
     dt: 0,
     t: 0,
     player: 0 as Entity,
+    playerCooldown: { primary: 0, secondary: 0 },
     entityPoolSize: MAX_ENTITIES,
     changed,
     tags,

@@ -8,6 +8,8 @@ export const update = (world: World) => {
   {
     const dir = getFromArray2(world.direction, world.player);
     vec2.copy(dir, world.inputs.rightDirection);
+    const l = vec2.len(dir);
+    if (l >= 0) vec2.scale(dir, dir, 1 / l);
   }
 
   {

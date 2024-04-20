@@ -32,7 +32,7 @@ export const update = (world: World) => {
 
         const l = Math.hypot(dx, dy);
 
-        const angle = l > 0 ? Math.atan2(dx / l, dy / l) + Math.PI : 0;
+        const angle = l > 0 ? Math.atan2(dy / l, dx / l) : 0;
 
         vec3.rotateZ(a, a, ZERO, angle);
         vec3.rotateZ(b, b, ZERO, angle);

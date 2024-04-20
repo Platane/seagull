@@ -9,6 +9,7 @@ import { update as update_wobble } from "./world/systems/cameraWobble";
 import { update as update_clock } from "./world/systems/clock";
 import { createEventListeners } from "./world/systems/eventListeners";
 import { update as update_playerMovement } from "./world/systems/playerMovement";
+import { update as update_playerWeapon } from "./world/systems/playerWeapon";
 import { update as update_spawnEnemy } from "./world/systems/spawnEnemy";
 
 const world = createWorld();
@@ -29,6 +30,7 @@ const loop = () => {
   update_renderer(world);
   update_wobble(world);
   update_playerMovement(world);
+  update_playerWeapon(world);
   update_applyVelocity(world);
 
   update_fullscreen(world);
