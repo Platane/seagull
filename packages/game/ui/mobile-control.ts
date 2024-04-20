@@ -12,6 +12,7 @@ width: min(max( 200px, 25vw, 25vh ), calc( 50vw - 30px ) , calc( 50vh - 30px ) )
 aspect-ratio: 1;
 border-radius: 50%;
 border: solid 20px #ddda;
+z-index: 2;
 `;
 
 const leftStickDotElement = document.createElement("div");
@@ -47,6 +48,7 @@ right: 20px;
 width: min(max( 200px, 25vw, 25vh ), calc( 50vw - 30px ) , calc( 50vh - 30px ) );
 aspect-ratio: 1;
 pointer-events: none;
+z-index: 2;
 
 `;
 const secondaryButtonElement = document.createElement("button");

@@ -1,7 +1,9 @@
 import { draw, update as update_renderer } from "./renderer";
+import { canvas } from "./renderer/canvas";
 import { update as update_fullscreen } from "./ui/fullscreen";
 import "./ui/global";
 import { update as update_ui_mobile_control } from "./ui/mobile-control";
+import { startButton } from "./ui/start-screen";
 import { createWorld } from "./world";
 import { update as update_applyVelocity } from "./world/systems/applyVelocity";
 import { update as update_camera } from "./world/systems/cameraUpdate";
@@ -54,4 +56,9 @@ const loop = () => {
   requestAnimationFrame(loop);
 };
 
-loop();
+document.body.appendChild(startButton);
+startButton.onclick = () => {
+  document.body.removeChild(startButton);
+  document.body.appendChild(canvas);
+  loop();
+};

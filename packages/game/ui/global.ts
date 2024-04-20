@@ -18,12 +18,16 @@ export const globalClassName = css`
   body {
     margin: 0;
     min-height: 100vh;
+    min-width: 100vw;
+    display: flex;
   }
 
-  #a{
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-  }
+
 }
+`;
+
+export const canvasClassName = css`
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
 `;

@@ -1,4 +1,8 @@
-export const canvas = document.getElementById("a") as HTMLCanvasElement;
+import { canvasClassName } from "../ui/global";
+
+export const canvas = document.createElement("canvas");
+
+canvas.className = canvasClassName;
 
 export const gl = canvas.getContext("webgl2")!;
 
