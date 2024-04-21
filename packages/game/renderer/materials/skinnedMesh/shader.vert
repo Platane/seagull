@@ -54,14 +54,37 @@ void main() {
   //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[3]) + 3, n), 0)
   // );
 
+  vec4 a = texelFetch(u_instancesTexture, ivec2(0, n), 0);
+  vec4 b = texelFetch(u_instancesTexture, ivec2(1, n), 0);
 
-  // mat4 bm = 
+  vec2 position = vec2(a[0],a[1]);
+  vec2 direction = vec2(a[2],a[3]);
+  
+  int pose0 = int(b[0]);
+  int pose1 = int(b[1]);
+
+  float pose0weight = b[2];
+  float pose1weight = b[3];
+
+
+  // mat4 bm = s
   //   bm0 * a_weights[0] +
   //   bm1 * a_weights[1] +
-  //   bm2 * a_weights[2] +
+  //   bm2 * a_weights[2] +s
   //   bm3 * a_weights[3] ;
 
-  gl_Position = u_viewMatrix * a_position;
+  vec4 p = vec4(
+    (a_position.y * direction.x + a_position.x* direction.y),
+   -(a_position.x * direction.x - a_position.y* direction.y),
+    a_position.z,
+    1.0
+  );
+  // veds
+
+  p.x += position.x;
+  p.y += position.y;
+
+  gl_Position = u_viewMatrix * p;
 
   v_normal =  vec3(a_normal);
 
@@ -69,8 +92,9 @@ void main() {
 
   v_color = vec3(a_weights);
   // v_color.r = float(a_boneIndexes[0]);
-  v_color.r = float(n);
+  v_color = vec3(float(n),0.0,0.0);
   
   v_color = a_color;
+  // v_color = a.xyz;
 }
 

@@ -65,11 +65,17 @@ export const seagullModelPromise = fetchVertices(
 
       //
       if (i < verticesSegments[0] / 3) {
-        vec3.set(color, 0.8, 0.86, 0.9);
+        if (
+          i === verticesSegments[0] / 3 - 3 ||
+          i === verticesSegments[0] / 3 - 5 ||
+          i === verticesSegments[0] / 3 - 15
+        )
+          vec3.set(color, 0.3, 0.35, 0.35);
+        else vec3.set(color, 0.9, 0.92, 0.92);
       } else if (i < verticesSegments[0] / 3 + verticesSegments[1] / 3) {
         vec3.set(color, 0.5, 0.5, 0.5);
       } else {
-        vec3.set(color, 1, 0.5, 0.5);
+        vec3.set(color, 1, 0.7, 0.3);
       }
 
       copyIntoArray3(colors, i * 3 + 0, color);

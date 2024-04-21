@@ -32,27 +32,21 @@ seagullModelPromise
     const instances = new Float32Array(MAX_INSTANCES * 8);
 
     const update = (world: World) => {
+      let j = 0;
+
       for (let entity = 1; entity < world.entityPoolSize; entity++) {
         const i = world.visual_model[entity];
         if (i) {
+          instances[j * 8 + 0] = world.position[entity * 2 + 0];
+          instances[j * 8 + 1] = world.position[entity * 2 + 1];
+
+          instances[j * 8 + 2] = world.direction[entity * 2 + 0];
+          instances[j * 8 + 3] = world.direction[entity * 2 + 1];
+
+          j++;
         }
       }
-
-      const player = world.player;
-
-      instances[0] = world.position[player * 2 + 0];
-      instances[1] = world.position[player * 2 + 1];
-
-      instances[2] = world.direction[player * 2 + 0];
-      instances[3] = world.direction[player * 2 + 1];
-
-      instances[4] = 0;
-      instances[5] = 1;
-
-      instances[6] = 0;
-      instances[7] = 0;
-
-      updateInstances(instances, 1);
+      updateInstances(instances, j);
     };
 
     seagull = { update, draw };

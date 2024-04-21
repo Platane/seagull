@@ -30,7 +30,7 @@ export const update = (world: World) => {
   }
 
   if (!spawned) {
-    for (let i = 1; i--; ) {
+    for (let i = 16; i--; ) {
       const entity = createEntity(world);
 
       world.position[entity * 2 + 0] = Math.random() * 10 - 5;
@@ -39,7 +39,8 @@ export const update = (world: World) => {
       world.direction[entity * 2 + 0] = 0;
       world.direction[entity * 2 + 1] = 0;
 
-      world.visual_sprite[entity] = 3;
+      // world.visual_sprite[entity] = 3;
+      world.visual_model[entity] = 3;
 
       world.hitBoxSize[entity] = 0.4;
 

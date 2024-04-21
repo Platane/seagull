@@ -16,10 +16,17 @@ export const update = (world: World) => {
 
       const V = 0.3;
 
-      const l = vec2.len(v) || 1;
+      const l = vec2.len(v);
 
-      v[0] = (v[0] / l) * V;
-      v[1] = (v[1] / l) * V;
+      if (l > 0) {
+        if (l > 0) {
+          world.direction[entity * 2 + 0] = -v[0] / l;
+          world.direction[entity * 2 + 1] = -v[1] / l;
+        }
+
+        v[0] = (v[0] / l) * V;
+        v[1] = (v[1] / l) * V;
+      }
     }
   }
 };

@@ -8,7 +8,7 @@ import codeVert from "./shader.vert";
 // texture index
 let i = 1;
 
-export const MAX_INSTANCES = 1 << 10;
+export const MAX_INSTANCES = 1 << 8;
 
 export const createSkinnedMeshMaterial = ({
   positions,
@@ -195,11 +195,11 @@ export const createSkinnedMeshMaterial = ({
 
     gl.bindVertexArray(vao);
 
-    // gl.bindTexture(gl.TEXTURE_2D, posesTexture);
-    // gl.uniform1i(u_posesTexture, POSES_TEXTURE_INDEX);
+    gl.bindTexture(gl.TEXTURE_2D, posesTexture);
+    gl.uniform1i(u_posesTexture, POSES_TEXTURE_INDEX);
 
-    // gl.bindTexture(gl.TEXTURE_2D, instancesTexture);
-    // gl.uniform1i(u_instancesTexture, INSTANCES_TEXTURE_INDEX);
+    gl.bindTexture(gl.TEXTURE_2D, instancesTexture);
+    gl.uniform1i(u_instancesTexture, INSTANCES_TEXTURE_INDEX);
 
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
