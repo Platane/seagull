@@ -6,6 +6,7 @@ import linaria from "@wyw-in-js/rollup";
 import { InputOptions, OutputOptions } from "rollup";
 import css from "rollup-plugin-css-only";
 import esbuild from "rollup-plugin-esbuild";
+// @ts-ignore
 import importAssets from "rollup-plugin-import-assets";
 import visualizer from "rollup-plugin-visualizer";
 import { MinifyOptions } from "terser";
