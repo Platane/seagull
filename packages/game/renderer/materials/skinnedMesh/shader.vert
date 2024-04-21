@@ -7,7 +7,7 @@ in vec4 a_normal;
 in vec3 a_color;
 
 in vec4 a_weights;
-// in uvec4 a_boneIndexes;
+in uvec4 a_boneIndexes;
 
 in uint a_instanceIndex;
 
@@ -89,12 +89,27 @@ void main() {
   v_normal = rot * vec3(a_normal);
 
 
+  //
+  // debugger weight
+  int j=5;
+  float weightJ=0.0;
+  if( int(a_boneIndexes[0]) == j ){
+    weightJ=a_weights[0];
+  } else if( int(a_boneIndexes[1]) == j ){
+    weightJ=a_weights[1];
+  } else if( int(a_boneIndexes[2]) == j ){
+    weightJ=a_weights[2];
+  } else if( int(a_boneIndexes[3]) == j ){
+    weightJ=a_weights[3];
+  } 
+
 
   v_color = vec3(a_weights);
-  // v_color.r = float(a_boneIndexes[0]);
+  v_color.r = float(a_boneIndexes[0]);
   v_color = vec3(float(n),0.0,0.0);
   
   v_color = a_color;
+  v_color = vec3(weightJ,weightJ,0.0);
   // v_color = a.xyz;
 }
 

@@ -68,7 +68,7 @@ seagullModelPromise
               gizmos.push(
                 ...bones.map((p) => {
                   const m = mat4.create();
-                  mat4.fromTranslation(m, p);
+                  mat4.copy(m, p);
                   mat4.multiply(m, w, m);
                   mat4.multiply(m, u, m);
                   return m;

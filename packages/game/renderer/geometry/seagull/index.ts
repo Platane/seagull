@@ -6,6 +6,7 @@ import {
   verticesSegments,
 } from "../../../assets/models/seagull/meta.json";
 import { copyIntoArray3 } from "../../../utils/vec3";
+import { computeWeights } from "../../utils/computeWeights";
 import { fetchVertices } from "../utils/fetchVertices";
 import { getFlatShadingNormals } from "../utils/flatShading";
 
@@ -17,7 +18,7 @@ export const seagullModelPromise = fetchVertices(
 
   const positions = new Float32Array(rawPositions.length * 2);
   const colors = Array.from(positions);
-  const bones: vec3[] = [];
+  const bones: mat4[] = [];
 
   {
     const [sx, sy, sz] = packedGeometrySize;
@@ -30,8 +31,9 @@ export const seagullModelPromise = fetchVertices(
       const py = y / s - (sy / s) * 0.5;
       const pz = z / s - (sz / s) * 0.5;
 
-      if (px === 0) bones.push([0, -pz, py]);
-      else bones.push([px, -pz, py], [-px, -pz, py]);
+      bones.push(mat4.fromTranslation(mat4.create(), [px, -pz, py]));
+      if (px !== 0)
+        bones.push(mat4.fromTranslation(mat4.create(), [-px, -pz, py]));
     }
 
     for (let i = 0; i < n / 9; i++) {
@@ -100,13 +102,13 @@ export const seagullModelPromise = fetchVertices(
 
   const normals = getFlatShadingNormals(positions);
 
-  const weights = new Float32Array(
-    Array.from({ length: positions.length / 3 }, () => [1, 0, 0, 0]).flat(),
-  );
+  // const weights = new Float32Array(
+  //   Array.from({ length: positions.length / 3 }, () => [1, 0, 0, 0]).flat(),
+  // );
 
-  const boneIndexes = new Uint8Array(
-    Array.from({ length: positions.length / 3 }, () => [1, 0, 0, 0]).flat(),
-  );
+  // const boneIndexes = new Uint8Array(
+  //   Array.from({ length: positions.length / 3 }, () => [1, 0, 0, 0]).flat(),
+  // );
 
   const bonesCount = bones.length;
   const posesCount = 1;
@@ -126,8 +128,9 @@ export const seagullModelPromise = fetchVertices(
     positions,
     colors: new Float32Array(colors),
     normals,
-    weights,
-    boneIndexes,
+    // weights,
+    // boneIndexes,
+    ...computeWeights(bones, positions),
     poses,
     bonesCount,
     posesCount,
