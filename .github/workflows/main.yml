@@ -16,6 +16,8 @@ jobs:
 
       - run: bun ./packages/game-bundler/bundle.ts
 
+      - run: bun ./packages/model-builder/build.ts
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
