@@ -16,6 +16,9 @@ import { update as update_playerMovement } from "./world/systems/playerMovement"
 import { update as update_playerWeapon } from "./world/systems/playerWeapon";
 import { update as update_spawnEnemy } from "./world/systems/spawnEnemy";
 
+import "./renderer/geometry/seagull";
+import { seagullModelPromise } from "./renderer/geometry/seagull";
+
 const world = createWorld();
 
 createEventListeners(world);
@@ -24,7 +27,7 @@ let lastDate = 0;
 const loop = () => {
   const now = Date.now();
   lastDate = lastDate || now;
-  world.dt = (now - lastDate) / 1000;
+  world.dt = Math.min(now - lastDate, 200) / 1000;
   lastDate = now;
 
   //
@@ -65,6 +68,17 @@ const loop = () => {
   //
   requestAnimationFrame(loop);
 };
+
+startButton.disabled = true;
+startButton.textContent = "Loading...";
+Promise.all([
+  //
+  seagullModelPromise,
+  // new Promise((r) => setTimeout(r, 100)),
+]).then(() => {
+  startButton.disabled = false;
+  startButton.textContent = "Start";
+});
 
 document.body.appendChild(startButton);
 startButton.onclick = () => {

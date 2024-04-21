@@ -1,10 +1,12 @@
 import * as path from "path";
 import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
 import linaria from "@wyw-in-js/rollup";
 import { InputOptions, OutputOptions } from "rollup";
 import css from "rollup-plugin-css-only";
 import esbuild from "rollup-plugin-esbuild";
+import importAssets from "rollup-plugin-import-assets";
 import visualizer from "rollup-plugin-visualizer";
 import { MinifyOptions } from "terser";
 import { glsl } from "./rollup-plugin-glsl";
@@ -49,6 +51,8 @@ export const createRollupInputOptions = (production: boolean) => {
         extensions: [".tsx", ".ts", ".js"],
       }),
 
+      json(),
+
       linaria({
         include: [path.resolve(__dirname, "..", "game", "ui") + "/**/*.ts"],
         extensions: [".ts"],
@@ -72,6 +76,13 @@ export const createRollupInputOptions = (production: boolean) => {
         define: {
           "process.env.NODE_ENV": production ? '"production"' : '"dev"',
         },
+      }),
+
+      importAssets({
+        include: [/\.bin$/i],
+        emitAssets: true,
+        fileNames: "[hash].[ext]",
+        publicPath: "",
       }),
 
       glsl({

@@ -1,6 +1,8 @@
-import { World } from "../world";
+import type { World } from "../world";
 import { canvas, dpr, gl } from "./canvas";
+import { seagullModelPromise } from "./geometry/seagull";
 import { draw as draw_gizmo } from "./materials/gizmo";
+import { createSkinnedMeshMaterial } from "./materials/skinnedMesh";
 import { draw as draw_sprites } from "./materials/sprites/draw";
 import { update as update_sprites } from "./materials/sprites/update";
 
@@ -20,6 +22,11 @@ export const update = (world: World) => {
   }
 };
 
+let seagull: { draw: (world: World) => void };
+seagullModelPromise
+  .then(createSkinnedMeshMaterial)
+  .then((res) => (seagull = res));
+
 export const draw = (world: World) => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -29,4 +36,6 @@ export const draw = (world: World) => {
   draw_gizmo(world);
   update_sprites(world);
   draw_sprites(world);
+
+  seagull?.draw(world);
 };

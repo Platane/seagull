@@ -1,0 +1,11 @@
+{
+  "name": "@seagull/model-builder",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@types/three": "0.163.0",
+    "three": "0.163.0",
+    "three-stdlib": "2.29.6"
+  }
+}
