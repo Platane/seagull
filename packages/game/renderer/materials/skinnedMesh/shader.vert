@@ -73,20 +73,20 @@ void main() {
   //   bm2 * a_weights[2] +s
   //   bm3 * a_weights[3] ;
 
-  vec4 p = vec4(
-    (a_position.y * direction.x + a_position.x* direction.y),
-   -(a_position.x * direction.x - a_position.y* direction.y),
-    a_position.z,
-    1.0
+  mat3 rot = mat3(
+     direction.y, -direction.x, 0,
+     direction.x,  direction.y, 0,
+               0,            0, 1
   );
-  // veds
+
+  vec4 p = vec4( ( rot * a_position.xyz ), 1.0 );
 
   p.x += position.x;
   p.y += position.y;
 
   gl_Position = u_viewMatrix * p;
 
-  v_normal =  vec3(a_normal);
+  v_normal = rot * vec3(a_normal);
 
 
 

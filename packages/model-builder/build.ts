@@ -65,15 +65,15 @@ export const pack = (vertices: THREE.Vector3[]) => {
     vertices
       .map((v) =>
         [
-          ((v.x - center.x + size.x / 2) / size.x) * 0.999,
-          ((v.y - center.y + size.y / 2) / size.y) * 0.999,
-          ((v.z - center.z + size.z / 2) / size.z) * 0.999,
+          ((v.x - center.x + size.x / 2) / size.x) * 0.9999,
+          ((v.y - center.y + size.y / 2) / size.y) * 0.9999,
+          ((v.z - center.z + size.z / 2) / size.z) * 0.9999,
         ].map((x) => x * 256),
       )
       .flat(),
   );
 
-  return { pack, size };
+  return { pack, size, center };
 };
 
 //
@@ -87,12 +87,6 @@ export const pack = (vertices: THREE.Vector3[]) => {
 
   logScene(model);
 
-  const bones = nodes
-    .filter((o) => o.name.startsWith("gizmo"))
-    .map((o) => o.position.round().toArray());
-
-  console.log("\n\nbones\n" + bones.join("\n"));
-
   const body = getPositionVectors(nodes.find((o) => o.name === "body")!);
   const leg = getPositionVectors(nodes.find((o) => o.name === "leg")!);
   const eye = getPositionVectors(nodes.find((o) => o.name === "eye")!);
@@ -100,6 +94,18 @@ export const pack = (vertices: THREE.Vector3[]) => {
   const flap = getPositionVectors(nodes.find((o) => o.name === "flap")!);
 
   const packed = pack([...body, ...flap, ...eye, ...beak, ...leg]);
+
+  const bones = nodes
+    .filter((o) => o.name.startsWith("gizmo"))
+    .map((o) =>
+      [
+        o.position.x - packed.center.x + packed.size.x / 2,
+        o.position.y - packed.center.y + packed.size.y / 2,
+        o.position.z - packed.center.z + packed.size.z / 2,
+      ].map(Math.round),
+    );
+
+  console.log("\n\nbones\n" + bones.join("\n"));
 
   const meta = {
     verticesSegments: [

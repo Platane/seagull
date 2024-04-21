@@ -1,8 +1,8 @@
 import { mat4, vec3 } from "gl-matrix";
 import seagullGeometryUrl from "../../../assets/models/seagull/geometry.bin";
 import {
-  bones,
   packedGeometrySize,
+  bones as rawBones,
   verticesSegments,
 } from "../../../assets/models/seagull/meta.json";
 import { copyIntoArray3 } from "../../../utils/vec3";
@@ -17,12 +17,22 @@ export const seagullModelPromise = fetchVertices(
 
   const positions = new Float32Array(rawPositions.length * 2);
   const colors = Array.from(positions);
+  const bones: vec3[] = [];
 
   {
     const [sx, sy, sz] = packedGeometrySize;
     const s = sy;
     const n = rawPositions.length;
     const color = vec3.create();
+
+    for (const [x, y, z] of rawBones) {
+      const px = x / s;
+      const py = y / s - (sy / s) * 0.5;
+      const pz = z / s - (sz / s) * 0.5;
+
+      if (px === 0) bones.push([0, -pz, py]);
+      else bones.push([px, -pz, py], [-px, -pz, py]);
+    }
 
     for (let i = 0; i < n / 9; i++) {
       const ax = rawPositions[i * 9 + 0 + 0] / s + (sx / s) * 0.5;
@@ -37,30 +47,30 @@ export const seagullModelPromise = fetchVertices(
       const cy = rawPositions[i * 9 + 6 + 1] / s;
       const cz = rawPositions[i * 9 + 6 + 2] / s;
 
-      positions[i * 9 + 0 + 0] = -ax;
-      positions[i * 9 + 0 + 1] = az;
+      positions[i * 9 + 0 + 0] = ax;
+      positions[i * 9 + 0 + 1] = -az;
       positions[i * 9 + 0 + 2] = ay;
 
-      positions[i * 9 + 3 + 0] = -bx;
-      positions[i * 9 + 3 + 1] = bz;
+      positions[i * 9 + 3 + 0] = bx;
+      positions[i * 9 + 3 + 1] = -bz;
       positions[i * 9 + 3 + 2] = by;
 
-      positions[i * 9 + 6 + 0] = -cx;
-      positions[i * 9 + 6 + 1] = cz;
+      positions[i * 9 + 6 + 0] = cx;
+      positions[i * 9 + 6 + 1] = -cz;
       positions[i * 9 + 6 + 2] = cy;
 
       //
 
-      positions[n + i * 9 + 0 + 0] = ax;
-      positions[n + i * 9 + 0 + 1] = az;
+      positions[n + i * 9 + 0 + 0] = -ax;
+      positions[n + i * 9 + 0 + 1] = -az;
       positions[n + i * 9 + 0 + 2] = ay;
 
-      positions[n + i * 9 + 3 + 0] = cx;
-      positions[n + i * 9 + 3 + 1] = cz;
+      positions[n + i * 9 + 3 + 0] = -cx;
+      positions[n + i * 9 + 3 + 1] = -cz;
       positions[n + i * 9 + 3 + 2] = cy;
 
-      positions[n + i * 9 + 6 + 0] = bx;
-      positions[n + i * 9 + 6 + 1] = bz;
+      positions[n + i * 9 + 6 + 0] = -bx;
+      positions[n + i * 9 + 6 + 1] = -bz;
       positions[n + i * 9 + 6 + 2] = by;
 
       //
@@ -71,9 +81,9 @@ export const seagullModelPromise = fetchVertices(
           i === verticesSegments[0] / 3 - 15
         )
           vec3.set(color, 0.3, 0.35, 0.35);
-        else vec3.set(color, 0.9, 0.92, 0.92);
+        else vec3.set(color, 0.92, 0.94, 0.93);
       } else if (i < verticesSegments[0] / 3 + verticesSegments[1] / 3) {
-        vec3.set(color, 0.5, 0.5, 0.5);
+        vec3.set(color, 0.3, 0.3, 0.3);
       } else {
         vec3.set(color, 1, 0.7, 0.3);
       }
@@ -111,6 +121,8 @@ export const seagullModelPromise = fetchVertices(
   );
 
   return {
+    bones,
+
     positions,
     colors: new Float32Array(colors),
     normals,

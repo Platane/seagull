@@ -1,7 +1,7 @@
 import { World } from "..";
 
 export const update = (world: World) => {
-  const A = 0.2;
+  const A = 0.6;
   const w = 0.7;
 
   world.camera.eye[0] =

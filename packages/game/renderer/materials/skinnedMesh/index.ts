@@ -8,7 +8,7 @@ import codeVert from "./shader.vert";
 // texture index
 let i = 1;
 
-export const MAX_INSTANCES = 1 << 8;
+export const MAX_INSTANCES = 1 << 10;
 
 export const createSkinnedMeshMaterial = ({
   positions,
