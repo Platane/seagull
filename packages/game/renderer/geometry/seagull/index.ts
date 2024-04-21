@@ -1,4 +1,4 @@
-import { vec3 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import seagullGeometryUrl from "../../../assets/models/seagull/geometry.bin";
 import {
   bones,
@@ -14,6 +14,18 @@ export const seagullModelPromise = fetchVertices(
   packedGeometrySize as vec3,
 ).then((positions) => {
   //
+
+  for (let i = 0; i < positions.length; i += 3) {
+    const s = packedGeometrySize[1];
+
+    const x = positions[i + 0];
+    const y = positions[i + 1];
+    const z = positions[i + 2];
+
+    positions[i + 0] = z / s;
+    positions[i + 1] = x / s;
+    positions[i + 2] = y / s;
+  }
 
   const colors = Array.from(positions);
   {
@@ -39,9 +51,34 @@ export const seagullModelPromise = fetchVertices(
 
   const normals = getFlatShadingNormals(positions);
 
+  const weights = new Float32Array(
+    Array.from({ length: positions.length / 3 }, () => [1, 0, 0, 0]).flat(),
+  );
+
+  const boneIndexes = new Uint8Array(
+    Array.from({ length: positions.length / 3 }, () => [1, 0, 0, 0]).flat(),
+  );
+
+  const bonesCount = bones.length;
+  const posesCount = 1;
+  const poses = new Float32Array(
+    Array.from({ length: posesCount }, () =>
+      Array.from({ length: bonesCount }, () => {
+        const m = mat4.create();
+        mat4.identity(m);
+        return [...m];
+      }),
+    ).flat(2),
+  );
+
   return {
     positions: new Float32Array(positions),
     colors: new Float32Array(colors),
     normals,
+    weights,
+    boneIndexes,
+    poses,
+    bonesCount,
+    posesCount,
   };
 });

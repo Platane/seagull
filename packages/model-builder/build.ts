@@ -32,18 +32,23 @@ const logScene = (n: THREE.Object3D, d = 0) => {
 /**
  * return geometry as list of triangles flattened
  */
-const getPositionVectors = (geo: THREE.BufferGeometry) => {
-  const positions = geo.getAttribute("position")!;
-  const indexes = geo.getIndex()!;
+const getPositionVectors = (m: THREE.Mesh) => {
+  const positions = m.geometry.getAttribute("position")!;
+  const indexes = m.geometry.getIndex()!;
 
-  return Array.from(indexes.array).map(
-    (i) =>
-      new THREE.Vector3(
-        positions.getX(i),
-        positions.getY(i),
-        positions.getZ(i),
-      ),
-  );
+  m.updateWorldMatrix(true, false);
+
+  return Array.from(indexes.array).map((i) => {
+    const p = new THREE.Vector3(
+      positions.getX(i),
+      positions.getY(i),
+      positions.getZ(i),
+    );
+
+    p.applyMatrix4(m.matrixWorld);
+
+    return p;
+  });
 };
 
 /**
@@ -88,17 +93,11 @@ export const pack = (vertices: THREE.Vector3[]) => {
 
   console.log("\n\nbones\n" + bones.join("\n"));
 
-  const body = getPositionVectors(
-    nodes.find((o) => o.name === "body")!.geometry,
-  );
-  const leg = getPositionVectors(nodes.find((o) => o.name === "leg")!.geometry);
-  const eye = getPositionVectors(nodes.find((o) => o.name === "eye")!.geometry);
-  const beak = getPositionVectors(
-    nodes.find((o) => o.name === "beak")!.geometry,
-  );
-  const flap = getPositionVectors(
-    nodes.find((o) => o.name === "flap")!.geometry,
-  );
+  const body = getPositionVectors(nodes.find((o) => o.name === "body")!);
+  const leg = getPositionVectors(nodes.find((o) => o.name === "leg")!);
+  const eye = getPositionVectors(nodes.find((o) => o.name === "eye")!);
+  const beak = getPositionVectors(nodes.find((o) => o.name === "beak")!);
+  const flap = getPositionVectors(nodes.find((o) => o.name === "flap")!);
 
   const packed = pack([...body, ...flap, ...eye, ...beak, ...leg]);
 

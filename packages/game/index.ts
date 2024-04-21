@@ -81,8 +81,12 @@ Promise.all([
 });
 
 document.body.appendChild(startButton);
-startButton.onclick = () => {
+
+const start = () => {
   document.body.removeChild(startButton);
   document.body.appendChild(canvas);
   loop();
 };
+startButton.onclick = start;
+
+start();

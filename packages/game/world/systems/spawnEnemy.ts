@@ -30,7 +30,7 @@ export const update = (world: World) => {
   }
 
   if (!spawned) {
-    for (let i = 16; i--; ) {
+    for (let i = 1; i--; ) {
       const entity = createEntity(world);
 
       world.position[entity * 2 + 0] = Math.random() * 10 - 5;

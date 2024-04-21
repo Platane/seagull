@@ -43,8 +43,9 @@ gl.vertexAttribPointer(a_texcoord, 2, gl.FLOAT, false, 0, 0);
 //
 // texture
 //
+const TEXTURE_INDEX = 0;
 const texture = gl.createTexture();
-gl.activeTexture(gl.TEXTURE0 + 2);
+gl.activeTexture(gl.TEXTURE0 + TEXTURE_INDEX);
 gl.bindTexture(gl.TEXTURE_2D, texture);
 gl.texImage2D(
   gl.TEXTURE_2D,
@@ -80,7 +81,7 @@ export const draw = (world: World) => {
   gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
 
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.uniform1i(u_texture, 2);
+  gl.uniform1i(u_texture, TEXTURE_INDEX);
 
   gl.drawArrays(gl.TRIANGLES, 0, sprite.count * 3 * 2);
 
