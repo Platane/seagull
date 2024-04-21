@@ -14,9 +14,9 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - run: bun ./packages/game-bundler/bundle.ts
-
       - run: bun ./packages/model-builder/build.ts
+
+      - run: bun ./packages/game-bundler/bundle.ts
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
