@@ -1,12 +1,15 @@
 import { World } from "..";
 
 export const update = (world: World) => {
+  const A = 0.2;
+  const w = 0.7;
+
   world.camera.eye[0] =
     world.camera.lookAtPoint[0] * 0.8 +
-    Math.sin(world.t * 0.8) * world.camera.eye[2] * 0.05;
+    Math.sin(world.t * w) * world.camera.eye[2] * A;
   world.camera.eye[1] =
     world.camera.lookAtPoint[1] * 0.8 +
-    Math.cos(world.t * 0.8) * world.camera.eye[2] * 0.05;
+    Math.cos(world.t * w) * world.camera.eye[2] * A;
 
   world.changed.camera = true;
 };

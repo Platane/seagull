@@ -83,6 +83,8 @@ export const draw = (world: World) => {
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(u_texture, TEXTURE_INDEX);
 
+  gl.disable(gl.CULL_FACE);
+
   gl.drawArrays(gl.TRIANGLES, 0, sprite.count * 3 * 2);
 
   gl.bindVertexArray(null);
