@@ -29,36 +29,49 @@ export const seagullModelPromise = Promise.all([
   const colors = new Float32Array(positions.length);
   colors.fill(0.5);
 
-  const poses = new Float32Array(bonesCount * posesCount * 16);
+  const p = vec3.create();
+  const q = quat.create();
+  const poseBones = Array.from({ length: posesCount }, (_, i) =>
+    Array.from({ length: bonesCount }, (_, j) => {
+      const k = i * bonesCount + j;
 
-  const posesMatrices: mat4[][] = [];
+      p[0] = posesRaw[k * 7 + 0];
+      p[1] = posesRaw[k * 7 + 1];
+      p[2] = posesRaw[k * 7 + 2];
 
-  {
-    const p = vec3.create();
-    const q = quat.create();
-    for (let i = 0; i < posesRaw.length / 7; i++) {
-      p[0] = posesRaw[i * 7 + 0];
-      p[1] = posesRaw[i * 7 + 1];
-      p[2] = posesRaw[i * 7 + 2];
+      q[0] = posesRaw[k * 7 + 3 + 0];
+      q[1] = posesRaw[k * 7 + 3 + 1];
+      q[2] = posesRaw[k * 7 + 3 + 2];
+      q[3] = posesRaw[k * 7 + 3 + 3];
 
-      q[0] = posesRaw[i * 7 + 3 + 0];
-      q[1] = posesRaw[i * 7 + 3 + 1];
-      q[2] = posesRaw[i * 7 + 3 + 2];
-      q[3] = posesRaw[i * 7 + 3 + 3];
-
-      const m: mat4 = poses.subarray(i * 16, (i + 1) * 16);
+      const m = mat4.create();
 
       mat4.fromRotationTranslation(m, q, p);
       mat4.fromTranslation(m, p);
 
-      const poseIndex = Math.floor(i / bonesCount);
+      return m;
+    }),
+  );
 
-      posesMatrices[poseIndex] = posesMatrices[poseIndex] ?? [];
-      posesMatrices[poseIndex].push(m);
-    }
-  }
+  const bindPoseBones = poseBones[0];
+  const bindPoseBonesInv = poseBones[0].map((m) =>
+    mat4.invert(mat4.create(), m),
+  );
 
-  const bones = posesMatrices[0];
+  const poses = new Float32Array(
+    poseBones.flatMap((bones) =>
+      bones.flatMap((bone, i) => {
+        const m = mat4.create();
+
+        mat4.multiply(m, bone, bindPoseBonesInv[i]);
+
+        return [...m];
+      }),
+    ),
+  );
+
+  console.log(poses);
+  debugger;
 
   {
     const n = halfPositions.length;
@@ -104,12 +117,12 @@ export const seagullModelPromise = Promise.all([
   }
 
   return {
-    bones,
+    poseBones,
 
     positions,
     colors,
     normals: getFlatShadingNormals(positions),
-    ...computeWeights(bones, positions),
+    ...computeWeights(bindPoseBones, positions),
     poses,
     bonesCount,
     posesCount,

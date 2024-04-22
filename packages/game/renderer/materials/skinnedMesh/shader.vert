@@ -24,45 +24,37 @@ out vec3 v_color;
 
  
 
+mat4 getBoneMatrix(uint poseIndex, uint boneIndex){
+  return mat4(
+    texelFetch(u_posesTexture, ivec2(4 * int(boneIndex) + 0, int(poseIndex)), 0),
+    texelFetch(u_posesTexture, ivec2(4 * int(boneIndex) + 1, int(poseIndex)), 0),
+    texelFetch(u_posesTexture, ivec2(4 * int(boneIndex) + 2, int(poseIndex)), 0),
+    texelFetch(u_posesTexture, ivec2(4 * int(boneIndex) + 3, int(poseIndex)), 0)
+  );
+}
+
+
+
 void main() {
 
 
-  // mat4 bm0 = mat4(
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[0]) + 0, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[0]) + 1, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[0]) + 2, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[0]) + 3, n), 0)
-  // );
-
-  // mat4 bm1 = mat4(
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[1]) + 0, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[1]) + 1, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[1]) + 2, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[1]) + 3, n), 0)
-  // );
-
-  // mat4 bm2 = mat4(
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[2]) + 0, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[2]) + 1, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[2]) + 2, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[2]) + 3, n), 0)
-  // );
-
-  // mat4 bm3 = mat4(
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[3]) + 0, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[3]) + 1, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[3]) + 2, n), 0),
-  //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[3]) + 3, n), 0)
-  // );
-
-  
 
 
-  // mat4 bm = s
-  //   bm0 * a_weights[0] +
-  //   bm1 * a_weights[1] +
-  //   bm2 * a_weights[2] +s
-  //   bm3 * a_weights[3] ;
+
+  mat4 bm0 = 
+    getBoneMatrix(a_instancePoseIndexes[0], a_boneIndexes[0]) * a_weights[0] +
+    getBoneMatrix(a_instancePoseIndexes[0], a_boneIndexes[1]) * a_weights[1] +
+    getBoneMatrix(a_instancePoseIndexes[0], a_boneIndexes[2]) * a_weights[2] +
+    getBoneMatrix(a_instancePoseIndexes[0], a_boneIndexes[3]) * a_weights[3] ;
+
+
+  mat4 bm1 = 
+    getBoneMatrix(a_instancePoseIndexes[1], a_boneIndexes[0]) * a_weights[0] +
+    getBoneMatrix(a_instancePoseIndexes[1], a_boneIndexes[1]) * a_weights[1] +
+    getBoneMatrix(a_instancePoseIndexes[1], a_boneIndexes[2]) * a_weights[2] +
+    getBoneMatrix(a_instancePoseIndexes[1], a_boneIndexes[3]) * a_weights[3] ;
+
+  mat4 bm = bm0 * a_instancePoseWeights[0] + bm1 * a_instancePoseWeights[1];
 
   mat3 rot = mat3(
      a_instanceDirection.y, -a_instanceDirection.x, 0,
@@ -70,7 +62,7 @@ void main() {
                          0,                      0, 1
   );
 
-  vec4 p = vec4( ( rot * a_position.xyz ), 1.0 );
+  vec4 p = vec4( ( rot * ( bm * a_position) .xyz ), 1.0 );
 
   p.x += a_instancePosition.x;
   p.y += a_instancePosition.y;

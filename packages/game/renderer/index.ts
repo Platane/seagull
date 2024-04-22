@@ -27,9 +27,9 @@ export const update = (world: World) => {
   }
 };
 
-let bones: mat4[] = [];
+let poseBones: mat4[][] = [];
 seagullModelPromise.then((res) => {
-  bones = res.bones;
+  poseBones = res.poseBones;
 });
 
 let seagull: { draw: (world: World) => void; update: (world: World) => void };
@@ -59,12 +59,14 @@ seagullModelPromise
           poseIndexes[j * 4 + 2] = 0;
           poseIndexes[j * 4 + 3] = 0;
 
-          poseWeights[j * 4 + 0] = 1;
-          poseWeights[j * 4 + 1] = 0;
+          const k = Math.sin(world.t * 3 + j);
+
+          poseWeights[j * 4 + 0] = 1 - k;
+          poseWeights[j * 4 + 1] = k;
           poseWeights[j * 4 + 2] = 0;
           poseWeights[j * 4 + 3] = 0;
 
-          if (j === 0 || true) {
+          if (j === 0) {
             const w = mat4.create();
             const u = mat4.create();
 
@@ -83,7 +85,7 @@ seagullModelPromise
             mat4.fromTranslation(u, [position[0], position[1], 0]);
 
             gizmos.push(
-              ...bones.map((p) => {
+              ...poseBones[i].map((p) => {
                 const m = mat4.create();
                 mat4.copy(m, p);
                 mat4.multiply(m, w, m);

@@ -10,7 +10,7 @@ export const update = (world: World) => {
       const entity = createEntity(world);
       world.player = entity;
 
-      world.visual_model[entity] = 3;
+      world.visual_model[entity] = 1;
       // world.visual_sprite[entity] = 2;
       world.hitBoxSize[entity] = 0.4;
       world.camera.following = entity;
@@ -41,7 +41,7 @@ export const update = (world: World) => {
       world.direction[entity * 2 + 1] = 0;
 
       world.visual_sprite[entity] = 3;
-      world.visual_model[entity] = 3;
+      world.visual_model[entity] = 1;
 
       world.hitBoxSize[entity] = 0.4;
 
