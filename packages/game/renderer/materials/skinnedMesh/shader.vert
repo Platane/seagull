@@ -91,17 +91,31 @@ void main() {
 
   //
   // debugger weight
-  int j=5;
-  float weightJ=0.0;
-  if( int(a_boneIndexes[0]) == j ){
-    weightJ=a_weights[0];
-  } else if( int(a_boneIndexes[1]) == j ){
-    weightJ=a_weights[1];
-  } else if( int(a_boneIndexes[2]) == j ){
-    weightJ=a_weights[2];
-  } else if( int(a_boneIndexes[3]) == j ){
-    weightJ=a_weights[3];
-  } 
+  // int j=5;
+  // float weightJ=0.0;
+  // if( int(a_boneIndexes[0]) == j ){
+  //   weightJ=a_weights[0];
+  // } else if( int(a_boneIndexes[1]) == j ){
+  //   weightJ=a_weights[1];
+  // } else if( int(a_boneIndexes[2]) == j ){
+  //   weightJ=a_weights[2];
+  // } else if( int(a_boneIndexes[3]) == j ){
+  //   weightJ=a_weights[3];
+  // } 
+
+  // int u=7;
+  // float weightU=0.0;
+  // if( int(a_boneIndexes[0]) == u ){
+  //   weightU=a_weights[0];
+  // } else if( int(a_boneIndexes[1]) == u ){
+  //   weightU=a_weights[1];
+  // } else if( int(a_boneIndexes[2]) == u ){
+  //   weightU=a_weights[2];
+  // } else if( int(a_boneIndexes[3]) == u ){
+  //   weightU=a_weights[3];
+  // } 
+  // v_color = vec3(weightJ,weightU,0.0);
+
 
 
   v_color = vec3(a_weights);
@@ -109,7 +123,6 @@ void main() {
   v_color = vec3(float(n),0.0,0.0);
   
   v_color = a_color;
-  v_color = vec3(weightJ,weightJ,0.0);
   // v_color = a.xyz;
 }
 
