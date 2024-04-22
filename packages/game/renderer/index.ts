@@ -27,6 +27,11 @@ export const update = (world: World) => {
   }
 };
 
+let bones: mat4[] = [];
+seagullModelPromise.then((res) => {
+  bones = res.bones;
+});
+
 let seagull: { draw: (world: World) => void; update: (world: World) => void };
 seagullModelPromise
   .then((res) => createSkinnedMeshMaterial(res))
@@ -38,6 +43,7 @@ seagullModelPromise
 
     const update = (world: World) => {
       let j = 0;
+      gizmos.length = 0;
 
       for (let entity = 1; entity < world.entityPoolSize; entity++) {
         const i = world.visual_model[entity];
@@ -58,7 +64,7 @@ seagullModelPromise
           poseWeights[j * 4 + 2] = 0;
           poseWeights[j * 4 + 3] = 0;
 
-          if (j === 0) {
+          if (j === 0 || true) {
             const w = mat4.create();
             const u = mat4.create();
 
@@ -76,22 +82,20 @@ seagullModelPromise
 
             mat4.fromTranslation(u, [position[0], position[1], 0]);
 
-            seagullModelPromise.then(({ bones }) => {
-              gizmos.length = 0;
-              gizmos.push(
-                ...bones.map((p) => {
-                  const m = mat4.create();
-                  mat4.copy(m, p);
-                  mat4.multiply(m, w, m);
-                  mat4.multiply(m, u, m);
-                  return m;
-                }),
-              );
-            });
+            gizmos.push(
+              ...bones.map((p) => {
+                const m = mat4.create();
+                mat4.copy(m, p);
+                mat4.multiply(m, w, m);
+                mat4.multiply(m, u, m);
+                return m;
+              }),
+            );
           }
           j++;
         }
       }
+
       updateInstances(positions, directions, poseIndexes, poseWeights, j);
     };
 

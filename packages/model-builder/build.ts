@@ -25,7 +25,7 @@ const loadModel = async (modelFilename: string) => {
  * log scene
  */
 const logScene = (n: THREE.Object3D, d = 0) => {
-  console.log(" ".repeat(d) + "·", n.name);
+  console.log("  ".repeat(d) + "·", n.name);
   n.children.forEach((c) => logScene(c, d + 1));
 };
 
@@ -35,8 +35,6 @@ const logScene = (n: THREE.Object3D, d = 0) => {
 const getPositionVectors = (m: THREE.Mesh) => {
   const positions = m.geometry.getAttribute("position")!;
   const indexes = m.geometry.getIndex()!;
-
-  m.updateWorldMatrix(true, false);
 
   return Array.from(indexes.array).map((i) => {
     const p = new THREE.Vector3(
@@ -61,7 +59,7 @@ export const pack = (vertices: THREE.Vector3[]) => {
   const center = bb.getCenter(new THREE.Vector3());
   const size = bb.getSize(new THREE.Vector3());
 
-  const pack = new Uint8Array(
+  const payload = new Uint8Array(
     vertices
       .map((v) =>
         [
@@ -73,8 +71,13 @@ export const pack = (vertices: THREE.Vector3[]) => {
       .flat(),
   );
 
-  return { pack, size, center };
+  return { payload, size, center };
 };
+
+const extractBones = (bone: THREE.Bone | THREE.Object3D): THREE.Matrix4[] => [
+  bone.matrixWorld,
+  ...bone.children.flatMap(extractBones),
+];
 
 //
 //
@@ -83,6 +86,7 @@ export const pack = (vertices: THREE.Vector3[]) => {
 
 {
   const model = await loadModel(__dirname + "/seagull.glb");
+  model.updateWorldMatrix(true, true);
   const nodes = model.children as THREE.Mesh[];
 
   logScene(model);
@@ -93,37 +97,85 @@ export const pack = (vertices: THREE.Vector3[]) => {
   const beak = getPositionVectors(nodes.find((o) => o.name === "beak")!);
   const flap = getPositionVectors(nodes.find((o) => o.name === "flap")!);
 
-  const packed = pack([...body, ...flap, ...eye, ...beak, ...leg]);
+  const vertices = [...body, ...flap, ...eye, ...beak, ...leg];
 
-  const bones = nodes
-    .filter((o) => o.name.startsWith("gizmo"))
-    .map((o) =>
-      [
-        o.position.x - packed.center.x + packed.size.x / 2,
-        o.position.y - packed.center.y + packed.size.y / 2,
-        o.position.z - packed.center.z + packed.size.z / 2,
-      ].map(Math.round),
-    );
+  const S = 1 / 42;
 
-  console.log("\n\nbones\n" + bones.join("\n"));
+  // biome-ignore format: <explanation>
+  const rotate = new THREE.Matrix4().set(
+    1, 0, 0, 0,
+    0, 0,-1, 0,
+    0, 1, 0, 0,
+    0, 0, 0, 1,
+  )
 
-  const meta = {
-    verticesSegments: [
-      body.length + flap.length,
-      eye.length,
-      beak.length,
-      leg.length,
-    ],
-
-    packedGeometrySize: packed.size.round().toArray(),
-    bones,
-  };
+  const packed = pack(
+    vertices.map((p) => p.applyMatrix4(rotate).multiplyScalar(S)),
+  );
 
   const assetDir = __dirname + "/../game/assets/models";
   const seagullDir = assetDir + "/seagull";
 
   fs.mkdirSync(seagullDir, { recursive: true });
 
-  fs.writeFileSync(seagullDir + "/geometry.bin", packed.pack);
-  fs.writeFileSync(seagullDir + "/meta.json", JSON.stringify(meta, null, 2));
+  fs.writeFileSync(seagullDir + "/geometry.bin", packed.payload);
+  fs.writeFileSync(
+    seagullDir + "/geometry-meta.json",
+    JSON.stringify(
+      {
+        size: packed.size.toArray(),
+        center: packed.center.toArray(),
+        verticesSegments: [
+          body.length + flap.length,
+          eye.length,
+          beak.length,
+          leg.length,
+        ],
+      },
+      null,
+      2,
+    ),
+  );
+
+  {
+    const poses = [
+      extractBones(nodes.find((o) => o.name === "pose-bind")!),
+      extractBones(nodes.find((o) => o.name === "pose-idle")!),
+    ];
+    const bonesCount = poses[0].length;
+    const posesCount = poses.length;
+
+    const payload = new Float32Array(
+      poses.flatMap((bones) =>
+        bones.flatMap((m) => {
+          const p = new THREE.Vector3();
+          const q = new THREE.Quaternion();
+          const s = new THREE.Vector3();
+
+          m.decompose(p, q, s);
+
+          const pp = p.applyMatrix4(rotate).multiplyScalar(S);
+
+          const Q = new THREE.Quaternion();
+          Q.setFromRotationMatrix(rotate);
+
+          const qq = Q.multiply(q);
+
+          return [...pp.toArray(), 0, 0, 0, 1];
+          return [...pp.toArray(), ...qq.toArray()];
+        }),
+      ),
+    );
+
+    fs.writeFileSync(seagullDir + "/pose.bin", payload);
+
+    fs.writeFileSync(
+      seagullDir + "/pose-meta.json",
+      JSON.stringify(
+        { bonesCount, posesCount, poses: ["bind", "idle"] },
+        null,
+        2,
+      ),
+    );
+  }
 }

@@ -44,7 +44,7 @@ export const createGizmoMaterial = () => {
   //
   //
 
-  const lll = 0.07;
+  const lll = 0.1;
 
   const kernel = [
     [0.0, lll, 0.0],

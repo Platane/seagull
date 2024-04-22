@@ -82,36 +82,44 @@ void main() {
 
   //
   // debugger weight
-  // int j=5;
-  // float weightJ=0.0;
-  // if( int(a_boneIndexes[0]) == j ){
-  //   weightJ=a_weights[0];
-  // } else if( int(a_boneIndexes[1]) == j ){
-  //   weightJ=a_weights[1];
-  // } else if( int(a_boneIndexes[2]) == j ){
-  //   weightJ=a_weights[2];
-  // } else if( int(a_boneIndexes[3]) == j ){
-  //   weightJ=a_weights[3];
-  // } 
+  uvec3 debugIndexes = uvec3(1,2,0);
+  vec3 debugWeights = vec3(0.0,0.0,0.0);
+  if( a_boneIndexes[0] == debugIndexes[0] ){
+    debugWeights[0]=a_weights[0];
+  } else if( a_boneIndexes[1] == debugIndexes[0] ){
+    debugWeights[0]=a_weights[1];
+  } else if( a_boneIndexes[2] == debugIndexes[0] ){
+    debugWeights[0]=a_weights[2];
+  } else if( a_boneIndexes[3] == debugIndexes[0] ){
+    debugWeights[0]=a_weights[3];
+  } 
 
-  // int u=7;
-  // float weightU=0.0;
-  // if( int(a_boneIndexes[0]) == u ){
-  //   weightU=a_weights[0];
-  // } else if( int(a_boneIndexes[1]) == u ){
-  //   weightU=a_weights[1];
-  // } else if( int(a_boneIndexes[2]) == u ){
-  //   weightU=a_weights[2];
-  // } else if( int(a_boneIndexes[3]) == u ){
-  //   weightU=a_weights[3];
-  // } 
-  // v_color = vec3(weightJ,weightU,0.0);
+  if( a_boneIndexes[0] == debugIndexes[1] ){
+    debugWeights[1]=a_weights[0];
+  } else if( a_boneIndexes[1] == debugIndexes[1] ){
+    debugWeights[1]=a_weights[1];
+  } else if( a_boneIndexes[2] == debugIndexes[1] ){
+    debugWeights[1]=a_weights[2];
+  } else if( a_boneIndexes[3] == debugIndexes[1] ){
+    debugWeights[1]=a_weights[3];
+  } 
+
+  if( a_boneIndexes[0] == debugIndexes[2] ){
+    debugWeights[2]=a_weights[0];
+  } else if( a_boneIndexes[1] == debugIndexes[2] ){
+    debugWeights[2]=a_weights[1];
+  } else if( a_boneIndexes[2] == debugIndexes[2] ){
+    debugWeights[2]=a_weights[2];
+  } else if( a_boneIndexes[3] == debugIndexes[2] ){
+    debugWeights[2]=a_weights[3];
+  }
+  v_color = debugWeights;
 
 
 
   v_color = vec3(a_weights);
-  // v_color = vec3( float(a_instancePoseIndexes[0])/10.0,a_instancePoseWeights[0], float(a_boneIndexes[0]));
-  // v_color = vec3(a_instanceDirection,0.0);
+  v_color = vec3( float(a_instancePoseIndexes[0])/10.0,a_instancePoseWeights[0], float(a_boneIndexes[0]));
+  v_color = vec3(a_instanceDirection,0.0);
   
   v_color = a_color;
 }
