@@ -31,7 +31,10 @@ let seagull: { draw: (world: World) => void; update: (world: World) => void };
 seagullModelPromise
   .then((res) => createSkinnedMeshMaterial(res))
   .then(({ draw, updateInstances }) => {
-    const instances = new Float32Array(MAX_INSTANCES * 8);
+    const positions = new Float32Array(MAX_INSTANCES * 2);
+    const directions = new Float32Array(MAX_INSTANCES * 2);
+    const poseIndexes = new Uint8Array(MAX_INSTANCES * 2);
+    const poseWeights = new Float32Array(MAX_INSTANCES * 2);
 
     const update = (world: World) => {
       let j = 0;
@@ -39,18 +42,28 @@ seagullModelPromise
       for (let entity = 1; entity < world.entityPoolSize; entity++) {
         const i = world.visual_model[entity];
         if (i) {
-          instances[j * 8 + 0] = world.position[entity * 2 + 0];
-          instances[j * 8 + 1] = world.position[entity * 2 + 1];
+          positions[j * 2 + 0] = world.position[entity * 2 + 0];
+          positions[j * 2 + 1] = world.position[entity * 2 + 1];
 
-          instances[j * 8 + 2] = world.direction[entity * 2 + 0];
-          instances[j * 8 + 3] = world.direction[entity * 2 + 1];
+          directions[j * 2 + 0] = world.direction[entity * 2 + 0];
+          directions[j * 2 + 1] = world.direction[entity * 2 + 1];
+
+          poseIndexes[j * 4 + 0] = i;
+          poseIndexes[j * 4 + 1] = 0;
+          poseIndexes[j * 4 + 2] = 0;
+          poseIndexes[j * 4 + 3] = 0;
+
+          poseWeights[j * 4 + 0] = 1;
+          poseWeights[j * 4 + 1] = 0;
+          poseWeights[j * 4 + 2] = 0;
+          poseWeights[j * 4 + 3] = 0;
 
           if (j === 0) {
             const w = mat4.create();
             const u = mat4.create();
 
-            const position = [instances[j * 8 + 0], instances[j * 8 + 1]];
-            const direction = [instances[j * 8 + 2], instances[j * 8 + 3]];
+            const position = [positions[j * 2 + 0], positions[j * 2 + 1]];
+            const direction = [directions[j * 2 + 0], directions[j * 2 + 1]];
             // const direction = [0, 1];
 
             // biome-ignore format: <explanation>
@@ -79,7 +92,7 @@ seagullModelPromise
           j++;
         }
       }
-      updateInstances(instances, j);
+      updateInstances(positions, directions, poseIndexes, poseWeights, j);
     };
 
     seagull = { update, draw };

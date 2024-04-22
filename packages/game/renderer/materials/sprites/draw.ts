@@ -1,5 +1,5 @@
 import { MAX_ENTITIES, World } from "../../../world";
-import { gl } from "../../canvas";
+import { getNextTextureIndex, gl } from "../../canvas";
 import { getAttribLocation, getUniformLocation } from "../../utils/location";
 import { createProgram } from "../../utils/program";
 import codeFrag from "./shader.frag";
@@ -43,7 +43,7 @@ gl.vertexAttribPointer(a_texcoord, 2, gl.FLOAT, false, 0, 0);
 //
 // texture
 //
-const TEXTURE_INDEX = 0;
+const TEXTURE_INDEX = getNextTextureIndex();
 const texture = gl.createTexture();
 gl.activeTexture(gl.TEXTURE0 + TEXTURE_INDEX);
 gl.bindTexture(gl.TEXTURE_2D, texture);

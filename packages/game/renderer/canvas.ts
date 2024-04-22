@@ -7,3 +7,6 @@ canvas.className = canvasClassName;
 export const gl = canvas.getContext("webgl2")!;
 
 export const dpr = Math.min(window.devicePixelRatio ?? 1, 2);
+
+let i = -1;
+export const getNextTextureIndex = () => i++;

@@ -20,8 +20,8 @@ export const update = (world: World) => {
 
       if (l > 0) {
         if (l > 0) {
-          world.direction[entity * 2 + 0] = -v[0] / l;
-          world.direction[entity * 2 + 1] = -v[1] / l;
+          world.direction[entity * 2 + 0] = v[0] / l;
+          world.direction[entity * 2 + 1] = v[1] / l;
         }
 
         v[0] = (v[0] / l) * V;

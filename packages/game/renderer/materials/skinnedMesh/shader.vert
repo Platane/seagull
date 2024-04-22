@@ -9,12 +9,14 @@ in vec3 a_color;
 in vec4 a_weights;
 in uvec4 a_boneIndexes;
 
-in uint a_instanceIndex;
+in vec2 a_instancePosition;
+in vec2 a_instanceDirection;
+in vec4 a_instancePoseWeights;
+in uvec4 a_instancePoseIndexes;
 
 
 // uniforms
 uniform mat4 u_viewMatrix;
-uniform sampler2D u_instancesTexture;
 uniform sampler2D u_posesTexture;
 
 out vec3 v_normal;
@@ -24,7 +26,6 @@ out vec3 v_color;
 
 void main() {
 
-  int n = int(a_instanceIndex);
 
   // mat4 bm0 = mat4(
   //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[0]) + 0, n), 0),
@@ -54,17 +55,7 @@ void main() {
   //   texelFetch(u_boneMatrixTexture, ivec2(4 * int(a_boneIndexes[3]) + 3, n), 0)
   // );
 
-  vec4 a = texelFetch(u_instancesTexture, ivec2(0, n), 0);
-  vec4 b = texelFetch(u_instancesTexture, ivec2(1, n), 0);
-
-  vec2 position = vec2(a[0],a[1]);
-  vec2 direction = vec2(a[2],a[3]);
   
-  int pose0 = int(b[0]);
-  int pose1 = int(b[1]);
-
-  float pose0weight = b[2];
-  float pose1weight = b[3];
 
 
   // mat4 bm = s
@@ -74,15 +65,15 @@ void main() {
   //   bm3 * a_weights[3] ;
 
   mat3 rot = mat3(
-     direction.y, -direction.x, 0,
-     direction.x,  direction.y, 0,
-               0,            0, 1
+     a_instanceDirection.y, -a_instanceDirection.x, 0,
+     a_instanceDirection.x,  a_instanceDirection.y, 0,
+                         0,                      0, 1
   );
 
   vec4 p = vec4( ( rot * a_position.xyz ), 1.0 );
 
-  p.x += position.x;
-  p.y += position.y;
+  p.x += a_instancePosition.x;
+  p.y += a_instancePosition.y;
 
   gl_Position = u_viewMatrix * p;
 
@@ -119,10 +110,9 @@ void main() {
 
 
   v_color = vec3(a_weights);
-  v_color.r = float(a_boneIndexes[0]);
-  v_color = vec3(float(n),0.0,0.0);
+  // v_color = vec3( float(a_instancePoseIndexes[0])/10.0,a_instancePoseWeights[0], float(a_boneIndexes[0]));
+  // v_color = vec3(a_instanceDirection,0.0);
   
   v_color = a_color;
-  // v_color = a.xyz;
 }
 

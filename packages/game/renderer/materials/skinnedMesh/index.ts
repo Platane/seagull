@@ -1,12 +1,9 @@
 import type { World } from "../../../world";
-import { gl } from "../../canvas";
+import { getNextTextureIndex, gl } from "../../canvas";
 import { getAttribLocation, getUniformLocation } from "../../utils/location";
 import { createProgram } from "../../utils/program";
 import codeFrag from "./shader.frag";
 import codeVert from "./shader.vert";
-
-// texture index
-let i = 1;
 
 export const MAX_INSTANCES = 1 << 10;
 
@@ -39,7 +36,7 @@ export const createSkinnedMeshMaterial = ({
   //
   // poses
   //
-  const POSES_TEXTURE_INDEX = i++;
+  const POSES_TEXTURE_INDEX = getNextTextureIndex();
   const posesTexture = gl.createTexture();
   const u_posesTexture = getUniformLocation(gl, program, "u_posesTexture");
   gl.activeTexture(gl.TEXTURE0 + POSES_TEXTURE_INDEX);
@@ -55,21 +52,6 @@ export const createSkinnedMeshMaterial = ({
     gl.FLOAT, // type
     poses,
   );
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-  //
-  // instances
-  //
-  const INSTANCES_TEXTURE_INDEX = i++;
-  const instancesTexture = gl.createTexture();
-  const u_instancesTexture = getUniformLocation(
-    gl,
-    program,
-    "u_instancesTexture",
-  );
-  gl.activeTexture(gl.TEXTURE0 + INSTANCES_TEXTURE_INDEX);
-  gl.bindTexture(gl.TEXTURE_2D, instancesTexture);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
@@ -131,18 +113,60 @@ export const createSkinnedMeshMaterial = ({
   gl.vertexAttribIPointer(a_boneIndexes, 4, gl.UNSIGNED_BYTE, 0, 0);
 
   //
-  // entity index
+  // instance position
   //
-  const instanceIndexBuffer = gl.createBuffer();
-  const instanceIndex = new Uint8Array(
-    Array.from({ length: MAX_INSTANCES }, (_, i) => i),
+  const instancePositionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, instancePositionBuffer);
+  const a_instancePosition = getAttribLocation(
+    gl,
+    program,
+    "a_instancePosition",
   );
-  gl.bindBuffer(gl.ARRAY_BUFFER, instanceIndexBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, instanceIndex, gl.STATIC_DRAW);
-  const a_entityIndex = getAttribLocation(gl, program, "a_instanceIndex");
-  gl.enableVertexAttribArray(a_entityIndex);
-  gl.vertexAttribIPointer(a_entityIndex, 1, gl.UNSIGNED_BYTE, 0, 0);
-  gl.vertexAttribDivisor(a_entityIndex, 1);
+  gl.enableVertexAttribArray(a_instancePosition);
+  gl.vertexAttribPointer(a_instancePosition, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribDivisor(a_instancePosition, 1);
+
+  //
+  // instance direction
+  //
+  const instanceDirectionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, instanceDirectionBuffer);
+  const a_instanceDirection = getAttribLocation(
+    gl,
+    program,
+    "a_instanceDirection",
+  );
+  gl.enableVertexAttribArray(a_instanceDirection);
+  gl.vertexAttribPointer(a_instanceDirection, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribDivisor(a_instanceDirection, 1);
+
+  //
+  // instance pose indexes
+  //
+  const instancePoseIndexesBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, instancePoseIndexesBuffer);
+  const a_instancePoseIndexes = getAttribLocation(
+    gl,
+    program,
+    "a_instancePoseIndexes",
+  );
+  gl.enableVertexAttribArray(a_instancePoseIndexes);
+  gl.vertexAttribIPointer(a_instancePoseIndexes, 4, gl.UNSIGNED_BYTE, 0, 0);
+  gl.vertexAttribDivisor(a_instancePoseIndexes, 1);
+
+  //
+  // instance pose weights
+  //
+  const instancePoseWeightsBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, instancePoseWeightsBuffer);
+  const a_instancePoseWeights = getAttribLocation(
+    gl,
+    program,
+    "a_instancePoseWeights",
+  );
+  gl.enableVertexAttribArray(a_instancePoseWeights);
+  gl.vertexAttribPointer(a_instancePoseWeights, 4, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribDivisor(a_instancePoseWeights, 1);
 
   //
   gl.bindVertexArray(null);
@@ -156,36 +180,27 @@ export const createSkinnedMeshMaterial = ({
 
   /**
    * update the instances
-   *
-   * - position_x
-   * - position_y
-   *
-   * - direction_x
-   * - direction_y
-   *
-   * - pose_a_index
-   * - pose_b_index
-   *
-   * - pose_a_weight
-   * - pose_b_weight
    */
-  const updateInstances = (instances: Float32Array, n: number) => {
+  const updateInstances = (
+    positions: Float32Array,
+    directions: Float32Array,
+    poseIndexes: Uint8Array,
+    poseWeight: Float32Array,
+    n: number,
+  ) => {
     nInstances = n;
 
-    gl.bindTexture(gl.TEXTURE_2D, instancesTexture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0, // level
-      gl.RGBA32F, // internal format
-      2, // 2 pixels, each pixel has RGBA so 2 pixels is 8 values,
-      MAX_INSTANCES, // one row per instance
-      0, // border
-      gl.RGBA, // format
-      gl.FLOAT, // type
-      instances,
-    );
+    gl.bindBuffer(gl.ARRAY_BUFFER, instancePositionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
 
-    0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, instanceDirectionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, directions, gl.DYNAMIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, instancePoseIndexesBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, poseIndexes, gl.DYNAMIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, instancePoseWeightsBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, poseWeight, gl.DYNAMIC_DRAW);
   };
 
   const draw = (world: World) => {
@@ -197,9 +212,6 @@ export const createSkinnedMeshMaterial = ({
 
     gl.bindTexture(gl.TEXTURE_2D, posesTexture);
     gl.uniform1i(u_posesTexture, POSES_TEXTURE_INDEX);
-
-    gl.bindTexture(gl.TEXTURE_2D, instancesTexture);
-    gl.uniform1i(u_instancesTexture, INSTANCES_TEXTURE_INDEX);
 
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
